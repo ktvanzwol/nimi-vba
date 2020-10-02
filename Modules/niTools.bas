@@ -43,7 +43,6 @@ Public Sub niTools_RaiseError(errorCode As Long, errorMsg As String, driver As S
     Err.Raise niErrorNumber, driver & " error occured.", msg
 End Sub
 
-
 Public Sub niTools_ErrorMsgBox(e As ErrObject)
     If e.Number = niErrorNumber Then
         ' Show NI formated error info
@@ -54,45 +53,4 @@ Public Sub niTools_ErrorMsgBox(e As ErrObject)
             vbMsgBoxHelpButton + vbExclamation + vbDefaultButton1 + vbApplicationModal, _
             "Microsoft Visual Basic for Applications", e.HelpFile, e.HelpContext
     End If
-    
-End Sub
-
-Public Sub ImportModules()
-    Dim VBComp As VBComponent
-    Dim wbPath As String
-    wbPath = ActiveWorkbook.path
-    
-    If Len(Dir(wbPath & "\Modules", vbDirectory)) = 0 Then
-       MkDir "c:\TOTN\Excel\Examples"
-    End If
-
-End Sub
-
-Public Sub ExportModules()
-    Dim VBComp As VBComponent
-    Dim wbPath As String
-    wbPath = ActiveWorkbook.path
-        
-    ' Export Modules, Class Modules and Forms
-    ' Files will be overwritten when they already exists
-    For Each VBComp In ActiveWorkbook.VBProject.VBComponents
-        Select Case VBComp.Type
-            Case vbext_ct_StdModule
-                If Len(Dir(wbPath & "\Modules", vbDirectory)) = 0 Then
-                   MkDir wbPath & "\Modules"
-                End If
-                VBComp.Export wbPath & "\Modules\" & VBComp.name & ".bas"
-            Case vbext_ct_ClassModule
-                If Len(Dir(wbPath & "\Class Modules", vbDirectory)) = 0 Then
-                   MkDir wbPath & "\Class Modules"
-                End If
-                VBComp.Export wbPath & "\Class Modules\" & VBComp.name & ".cls"
-            Case vbext_ct_MSForm
-                If Len(Dir(wbPath & "\Forms", vbDirectory)) = 0 Then
-                   MkDir wbPath & "\Forms"
-                End If
-                VBComp.Export wbPath & "\Forms\" & VBComp.name & ".frm"
-            Case Else
-        End Select
-    Next
 End Sub
