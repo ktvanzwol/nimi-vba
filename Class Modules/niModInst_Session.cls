@@ -21,7 +21,7 @@ Private Declare PtrSafe Function niModInst_GetInstalledDeviceAttributeViInt32 Li
     ByVal handle As Long, _
     ByVal index As Long, _
     ByVal attributeId As Long, _
-    ByVal attributeValue As Long _
+    ByRef attributeValue As Long _
 ) As Long
 
 'ViStatus niModInst_GetInstalledDeviceAttributeViString (ViSession handle, ViInt32 index, ViInt32 attributeID, ViInt32 attributeValueBufferSize, ViChar attributeValue[]);
