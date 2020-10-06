@@ -12,7 +12,7 @@ Public Const NI568X_VAL_MAX_TIME_IMMEDIATE As Long = 0 'Immediate timeout.
 Public Const NI568X_VAL_MAX_TIME_INFINITE As Long = -1 'Infinite timeout.
 
 ' ni568x Factory Method
-Public Function ni568x_CreateSession(resourceName As String, Optional IDQuery As Boolean = True, Optional reset As Boolean = True) As niDMM_Session
+Public Function ni568x_CreateSession(resourceName As String, Optional IDQuery As Boolean = True, Optional reset As Boolean = True) As ni568x_Session
     Dim session As ni568x_Session
     
     Set session = New ni568x_Session
