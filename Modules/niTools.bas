@@ -1,6 +1,11 @@
 Attribute VB_Name = "niTools"
 Option Explicit
 
+Type NIComplexNumber
+    real As Double
+    imaginary As Double
+End Type
+
 ' Based on example found at https://github.com/ReneNyffenegger/VBA-calls-DLL/blob/master/return-char-array/vba.bas
 Private Const CP_UTF8 As Long = 65001
 Private Declare PtrSafe Function MultiByteToWideChar Lib "kernel32" ( _
