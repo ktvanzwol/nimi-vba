@@ -72,7 +72,7 @@ Private Sub ErrorHandler(errorCode As Long)
     Dim errorMsg As String
        
     size = niModInst_GetExtendedErrorInfo(0, 0) + 1
-    buffer = String(size - 1, vbNullChar)
+    buffer = String(size - 1, " ")
     
     status = niModInst_GetExtendedErrorInfo(size, StrPtr(buffer))
     niTools_CStrPtrToStr size, StrPtr(buffer), errorMsg
