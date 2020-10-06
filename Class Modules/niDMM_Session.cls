@@ -87,7 +87,7 @@ Private Declare PtrSafe Function niDMM_Read Lib "niDMM_64" ( _
 Private Declare PtrSafe Function niDMM_GetAttributeViInt32 Lib "niDMM_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByRef value As Long _
 ) As Long
 
@@ -99,7 +99,7 @@ Private Declare PtrSafe Function niDMM_GetAttributeViInt32 Lib "niDMM_64" ( _
 Private Declare PtrSafe Function niDMM_SetAttributeViInt32 Lib "niDMM_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByVal value As Long _
 ) As Long
 
@@ -111,7 +111,7 @@ Private Declare PtrSafe Function niDMM_SetAttributeViInt32 Lib "niDMM_64" ( _
 Private Declare PtrSafe Function niDMM_GetAttributeViReal64 Lib "niDMM_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByRef value As Double _
 ) As Long
 
@@ -123,7 +123,7 @@ Private Declare PtrSafe Function niDMM_GetAttributeViReal64 Lib "niDMM_64" ( _
 Private Declare PtrSafe Function niDMM_SetAttributeViReal64 Lib "niDMM_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByVal value As Double _
 ) As Long
 
@@ -136,7 +136,7 @@ Private Declare PtrSafe Function niDMM_SetAttributeViReal64 Lib "niDMM_64" ( _
 Private Declare PtrSafe Function niDMM_GetAttributeViString Lib "niDMM_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByVal bufSize As Long, _
     ByVal value As LongPtr _
 ) As Long
@@ -149,7 +149,7 @@ Private Declare PtrSafe Function niDMM_GetAttributeViString Lib "niDMM_64" ( _
 Private Declare PtrSafe Function niDMM_SetAttributeViString Lib "niDMM_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByVal value As String _
 ) As Long
 
@@ -161,7 +161,7 @@ Private Declare PtrSafe Function niDMM_SetAttributeViString Lib "niDMM_64" ( _
 Private Declare PtrSafe Function niDMM_GetAttributeViBoolean Lib "niDMM_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByRef value As Boolean _
 ) As Long
 
@@ -173,7 +173,7 @@ Private Declare PtrSafe Function niDMM_GetAttributeViBoolean Lib "niDMM_64" ( _
 Private Declare PtrSafe Function niDMM_SetAttributeViBoolean Lib "niDMM_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByVal value As Boolean _
 ) As Long
 
@@ -272,7 +272,7 @@ Public Property Let Powerline_Freq(ByVal value As Double)
 End Property
 
 Public Property Get Resolution_Absolute() As Double
-    CheckError niDMM_GetAttributeViReal64(m_Session, "", NIDMM_ATTR_RESOLUTION_ABSOLUTE, Powerline_Freq)
+    CheckError niDMM_GetAttributeViReal64(m_Session, "", NIDMM_ATTR_RESOLUTION_ABSOLUTE, Resolution_Absolute)
 End Property
 
 Public Property Let Resolution_Absolute(ByVal value As Double)
