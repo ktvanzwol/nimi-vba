@@ -20,7 +20,7 @@ Private Declare PtrSafe Function niModInst_OpenInstalledDevicesSession Lib "niMo
 Private Declare PtrSafe Function niModInst_GetInstalledDeviceAttributeViInt32 Lib "niModInst_64" ( _
     ByVal handle As Long, _
     ByVal index As Long, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByRef attributeValue As Long _
 ) As Long
 
@@ -28,7 +28,7 @@ Private Declare PtrSafe Function niModInst_GetInstalledDeviceAttributeViInt32 Li
 Private Declare PtrSafe Function niModInst_GetInstalledDeviceAttributeViString Lib "niModInst_64" ( _
     ByVal handle As Long, _
     ByVal index As Long, _
-    ByVal attributeId As Long, _
+    ByVal attributeID As Long, _
     ByVal attributeValueBufferSize As Long, _
     ByVal attributeValue As LongPtr _
 ) As Long
@@ -96,19 +96,19 @@ Public Property Get Count() As Long
     Count = m_Count
 End Property
 
-Public Sub GetInstalledDeviceAttributeString(ByVal index As Long, ByVal attributeId As Long, ByRef attributeValue As String)
+Public Sub GetInstalledDeviceAttributeString(ByVal index As Long, ByVal attributeID As Long, ByRef attributeValue As String)
     Dim size As Long
     Dim buffer As String
     
-    size = niModInst_GetInstalledDeviceAttributeViString(m_Session, index, attributeId, 0, 0)
+    size = niModInst_GetInstalledDeviceAttributeViString(m_Session, index, attributeID, 0, 0)
     buffer = String(size - 1, vbNullChar)
     
-    CheckError niModInst_GetInstalledDeviceAttributeViString(m_Session, index, attributeId, size, StrPtr(buffer))
+    CheckError niModInst_GetInstalledDeviceAttributeViString(m_Session, index, attributeID, size, StrPtr(buffer))
     niTools_CStrPtrToStr size, StrPtr(buffer), attributeValue
 End Sub
 
-Public Sub GetInstalledDeviceAttributeLong(ByVal index As Long, ByVal attributeId As Long, ByRef attributeValue As Long)
-    CheckError niModInst_GetInstalledDeviceAttributeViInt32(m_Session, index, attributeId, attributeValue)
+Public Sub GetInstalledDeviceAttributeLong(ByVal index As Long, ByVal attributeID As Long, ByRef attributeValue As Long)
+    CheckError niModInst_GetInstalledDeviceAttributeViInt32(m_Session, index, attributeID, attributeValue)
 End Sub
 
 
