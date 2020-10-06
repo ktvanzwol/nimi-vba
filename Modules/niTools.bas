@@ -37,7 +37,7 @@ Public Sub niTools_RaiseError(errorCode As Long, errorMsg As String, driver As S
     
     msg = "Error " & Format(errorCode) & " occurred." & vbNewLine & vbNewLine & errorMsg
     If resourceName <> "" Then
-        msg = msg & vbNewLine & vbNewLine & "Resource Name: " & resourceName
+        msg = msg & vbNewLine & vbNewLine & "Resource Name: '" & resourceName & "'"
     End If
     
     Err.Raise niErrorNumber, driver & " error occured.", msg
@@ -46,10 +46,10 @@ End Sub
 Public Sub niTools_ErrorMsgBox(e As ErrObject)
     If e.Number = niErrorNumber Then
         ' Show NI formated error info
-        MsgBox e.description, vbOKOnly + vbCritical + vbDefaultButton1 + vbApplicationModal, e.Source
+        MsgBox e.Description, vbOKOnly + vbCritical + vbDefaultButton1 + vbApplicationModal, e.Source
     Else
         ' Try to mimic vba error
-        MsgBox "Run-time error '" & Format(e.Number) & "': " & vbNewLine & vbNewLine & e.description, _
+        MsgBox "Run-time error '" & Format(e.Number) & "': " & vbNewLine & vbNewLine & e.Description, _
             vbMsgBoxHelpButton + vbExclamation + vbDefaultButton1 + vbApplicationModal, _
             "Microsoft Visual Basic for Applications", e.HelpFile, e.HelpContext
     End If

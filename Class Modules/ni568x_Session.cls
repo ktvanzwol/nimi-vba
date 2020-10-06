@@ -108,10 +108,11 @@ Private Declare PtrSafe Function ni568x_SetAttributeViBoolean Lib "ni568x_64" ( 
     ByVal value As Boolean _
 ) As Long
 
-'ViStatus _VI_FUNC ni568x_error_message(ViSession vi, ViStatus errorCode, ViChar errorMessage[256]);
-Private Declare PtrSafe Function ni568x_error_message Lib "ni568x_64" ( _
+'ViStatus _VI_FUNC ni568x_GetError(ViSession vi, ViStatus *errorCode, ViInt32 bufferSize, ViChar description[]);
+Private Declare PtrSafe Function ni568x_GetError Lib "ni568x_64" ( _
     ByVal vi As Long, _
-    ByVal errorCode As Long, _
+    ByRef errorCode As Long, _
+    ByVal bufferSize As Long, _
     ByVal errMessage As LongPtr _
 ) As Long
 
@@ -143,13 +144,14 @@ Private Sub ErrorHandler(errorCode As Long)
     Dim size As Long
     Dim buffer As String
     Dim errorMsg As String
-    
-    buffer = String(1024, vbNullChar)
-    
-    status = ni568x_error_message(m_Session, errorCode, StrPtr(buffer))
-    niTools_CStrPtrToStr 1024, StrPtr(buffer), errorMsg
-    
-    niTools_RaiseError errorCode, errorMsg, "NI-DMM", "'" & m_ResourceName & "'"
+        
+    size = ni568x_GetError(m_Session, errorCode, 0, 0)
+    buffer = String(size - 1, "*")
+
+    status = ni568x_GetError(m_Session, errorCode, 1024, StrPtr(buffer))
+    niTools_CStrPtrToStr size, StrPtr(buffer), errorMsg
+        
+    niTools_RaiseError errorCode, errorMsg, "NI-568x", m_ResourceName
 End Sub
 
 Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean)

@@ -96,10 +96,11 @@ Private Declare PtrSafe Function ni<DRIVER>_SetAttributeViBoolean Lib "<DRIVER_D
     ByVal value As Boolean _
 ) As Long
 
-'ViStatus _VI_FUNC ni<DRIVER>_error_message(ViSession vi, ViStatus errorCode, ViChar errorMessage[256]);
-Private Declare PtrSafe Function ni<DRIVER>_Error_Message Lib "<DRIVER_DLL_NAME>" ( _
+'ViStatus _VI_FUNC ni<DRIVER>_GetError(ViSession vi, ViStatus *errorCode, ViInt32 bufferSize, ViChar description[]);
+Private Declare PtrSafe Function niRFSA_GetError Lib "<DRIVER_DLL_NAME>" ( _
     ByVal vi As Long, _
-    ByVal errorCode As Long, _
+    ByRef errorCode As Long, _
+    ByVal bufferSize As Long, _
     ByVal errMessage As LongPtr _
 ) As Long
 
@@ -132,13 +133,13 @@ Private Sub ErrorHandler(errorCode As Long)
     Dim buffer As String
     Dim errorMsg As String
     
-    size = ni<DRIVER>_GetErrorMessage(m_Session, errorCode, 0, 0)
+    size = ni<DRIVER>_GetError(m_Session, errorCode, 0, 0)
     buffer = String(size - 1, vbNullChar)
     
-    status = ni<DRIVER>_GetErrorMessage(m_Session, errorCode, size, StrPtr(buffer))
+    status = ni<DRIVER>_GetError(m_Session, errorCode, size, StrPtr(buffer))
     niTools_CStrPtrToStr size, StrPtr(buffer), errorMsg
     
-    niTools_RaiseError errorCode, errorMsg, "NI-<DRIVER>", "'" & m_ResourceName & "'"
+    niTools_RaiseError errorCode, errorMsg, "NI-<DRIVER>"
 End Sub
 
 Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean)

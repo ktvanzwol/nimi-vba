@@ -177,14 +177,10 @@ Private Declare PtrSafe Function niDMM_SetAttributeViBoolean Lib "niDMM_64" ( _
     ByVal value As Boolean _
 ) As Long
 
-'ViStatus _VI_FUNC niDMM_GetErrorMessage(
-'    ViSession   vi,
-'    ViStatus    errorCode,
-'    ViInt32     bufferSize,
-'    ViChar      errMessage[]);
-Private Declare PtrSafe Function niDMM_GetErrorMessage Lib "niDMM_64" ( _
+'ViStatus _VI_FUNC niDMM_GetError(ViSession vi, ViStatus *errorCode, ViInt32 bufferSize, ViChar description[]);
+Private Declare PtrSafe Function niDMM_GetError Lib "niDMM_64" ( _
     ByVal vi As Long, _
-    ByVal errorCode As Long, _
+    ByRef errorCode As Long, _
     ByVal bufferSize As Long, _
     ByVal errMessage As LongPtr _
 ) As Long
@@ -217,14 +213,14 @@ Private Sub ErrorHandler(errorCode As Long)
     Dim size As Long
     Dim buffer As String
     Dim errorMsg As String
-    
-    size = niDMM_GetErrorMessage(m_Session, errorCode, 0, 0)
+ 
+    size = niDMM_GetError(m_Session, errorCode, 0, 0)
     buffer = String(size - 1, vbNullChar)
-    
-    status = niDMM_GetErrorMessage(m_Session, errorCode, size, StrPtr(buffer))
+ 
+    status = niDMM_GetError(m_Session, errorCode, size, StrPtr(buffer))
     niTools_CStrPtrToStr size, StrPtr(buffer), errorMsg
     
-    niTools_RaiseError errorCode, errorMsg, "NI-DMM", "'" & m_ResourceName & "'"
+    niTools_RaiseError errorCode, errorMsg, "NI-DMM"
 End Sub
 
 Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean)
