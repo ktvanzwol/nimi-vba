@@ -1,4 +1,4 @@
-Attribute VB_Name = "ni<DRIVER>"
+Attribute VB_Name = "niDRIVER"
 Option Explicit
 
 ' Public Driver Constants
