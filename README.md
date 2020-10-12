@@ -39,8 +39,8 @@ How to map datatypes in VBA Declare statements and additional conversion needs
 | ``ViReal32`` | ``float`` | ``Single`` | |
 | ``ViReal64`` | ``double`` | ``Double`` | |
 | ``ViBoolean`` | ``unsigned short`` | ``Boolean`` | |
-| ``ViString`` | ``char \* `` | ``LongPtr`` | See [Using Pointers and Strings](#Using-Pointers-and-Strings) | 
-| ``ViConstString`` | ``const char \* `` | ``ByRef String`` | See [Using the ByRef str As String declaration](#Using-the-ByRef-str-As-String-declaration) | 
+| ``ViString`` | ``char * `` | ``LongPtr`` | See [Using Pointers and Strings](#Using-Pointers-and-Strings) | 
+| ``ViConstString`` | ``const char * `` | ``ByRef String`` | See [Using the ByRef str As String declaration](#Using-the-ByRef-str-As-String-declaration) | 
 | ``ViStatus`` | ``signed long`` | ``Long`` | |
 | ``ViSession`` | ``unsigned long`` | ``Long`` | |
 
@@ -108,7 +108,7 @@ Sub GetErrorMessage(m_Session As Long, errorCode As Long, ByRef errorMsg As Stri
     status = niDMM_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
     errorMsg = StrConv(buffer(), vbUnicode)
 ```
-First note that the errorMsg ``char \*`` argument is declared ``ByVal`` and as a ``LongPtr``. ``niDMM_GetError`` is first called with size set to 0 and a ``NULL`` pointer value, this will return the number of bytes needed for the buffer. Then ``ReDim`` is used to allocate the needed buffer and on the second call the pointer to this buffer is passed to the function using ``VarPtr(buffer(0))``.
+First note that the errorMsg ``char *`` argument is declared ``ByVal`` and as a ``LongPtr``. ``niDMM_GetError`` is first called with size set to 0 and a ``NULL`` pointer value, this will return the number of bytes needed for the buffer. Then ``ReDim`` is used to allocate the needed buffer and on the second call the pointer to this buffer is passed to the function using ``VarPtr(buffer(0))``.
 
 And as the final step ``errorMsg = StrConv(buffer(), vbUnicode)`` converts the C stype string to the Unicode String used by VBA.
 
@@ -120,7 +120,7 @@ buffer() = StrConv("StackOverflow", vbFromUnicode)
 This statement converts a Unicode String to a C Style string stored in a Byte array. In the same way you can pass the pointer to this Byte array to a C function like so: ``VarPtr(buffer(0))``.
 
 #### Using the ``ByRef str As String`` declaration
-VBA can handle the unicode convertion automatically when you define the argument using a ``ByRef String``. This works on most cases when you are dealing with input only arguments, typically defined as ``const char \*`` in C. As soon as you need to be able to pass a ``NULL`` pointer value you need to use the more generic ``LongPtr`` and Byte array declaration method wich is typical when receiving strings. 
+VBA can handle the unicode convertion automatically when you define the argument using a ``ByRef String``. This works on most cases when you are dealing with input only arguments, typically defined as ``const char *`` in C. As soon as you need to be able to pass a ``NULL`` pointer value you need to use the more generic ``LongPtr`` and Byte array declaration method wich is typical when receiving strings. 
 
 ## VBA Resources
 - [Declare statement (VBA) | Microsoft Docs](https://docs.microsoft.com/en-us/office/vba/language/reference/user-interface-help/declare-statement)
