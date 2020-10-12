@@ -21,7 +21,7 @@ To Do
 ### Properties & Attributes
 To Do
 
-## nimi-vba Data Types
+## Data Types
 How to map datatypes in VBA Declare statements and additional conversion needs
 
 | IVI / VISA Datatype | Base C Type         | Visual Basic Type   | Conversion needs    |
@@ -39,12 +39,12 @@ How to map datatypes in VBA Declare statements and additional conversion needs
 | ``ViReal32`` | ``float`` | ``Single`` | |
 | ``ViReal64`` | ``double`` | ``Double`` | |
 | ``ViBoolean`` | ``unsigned short`` | ``Boolean`` | |
-| ``ViString`` | ``char \* `` | ``LongPtr`` | Pass Byte Array using ``VarPtr(aByte(LBound(aByte)))`` and convert to/from ``String`` using the ``StrConv`` function | 
-| ``ViConstString`` | ``const char \* `` | ``ByRef String`` | Unicode conversion happens automatically | 
+| ``ViString`` | ``char \* `` | ``LongPtr`` | [See Using Pointers and Strings](#Using-Pointers-and-Strings) | 
+| ``ViConstString`` | ``const char \* `` | ``ByRef String`` | [See Using Pointers and Strings](#A-Note-on-using-the-ByRef-str-As-String-declaration) | 
 | ``ViStatus`` | ``signed long`` | ``Long`` | |
 | ``ViSession`` | ``unsigned long`` | ``Long`` | |
 
-### Pointers
+## Using Pointers and Strings
 In the VBA Declare statement you need to use ``ByVal`` to indicate a argument is passed **by value** and ``ByRef`` to when passed **by reference**. This means that in most cases you just need to use ``ByRef`` when in externally a pointer is required.
 
 So this C function declaraction 
@@ -119,7 +119,7 @@ buffer() = StrConv("StackOverflow", vbFromUnicode)
 ```
 This statement converts a Unicode String to a C Style string stored in a Byte array. In the same way you can pass the pointer to this Byte array to a C function like so: ``VarPtr(buffer(0))``.
 
-**A Note on using the** ``ByRef str As String`` **declaration**
+#### A Note on using the ``ByRef str As String`` declaration
 VBA can handle the unicode convertion automatically when you define the argument using a ``ByRef String``. This works on most cases when you are dealing with input only arguments, typically defined as ``const char \*`` in C. As soon as you need to be able to pass a ``NULL`` pointer value you need to use the ``LongPtr`` and Byte array declaration method wich is typical when receiving strings. 
 
 ## VBA Resources
