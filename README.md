@@ -72,15 +72,13 @@ In C arrays are also just pointers to the first element of the array. you can us
 ```VBA
 VarPtr( myArrayVarable( 0 ) )
 ```
-Or if when you don't know the exact array bounds use the more generic:
+Or when you don't know the exact array bounds use the more generic:
 ```VBA
 VarPtr( myArrayVarable( LBound( myArrayVarable ) ) )
 ```
 
-See [VBA Internals: Getting Pointers | bytecomb](https://bytecomb.com/vba-internals-getting-pointers/) for a overview of how to get the pointers as LongPtr of common VBA varable types.
-
 ### Strings
-C Strings are stored as Byte Arrays ``char \*`` so we can use the same aproach as for arrays to receive a C style string from external code.
+C Strings are stored as Byte Arrays ``char *`` so we can use the same aproach as for arrays to receive a C style string from external code.
 But VBA uses Ninicode and wide characters for its ``String`` type so we also need to deal with the convertion between Byte Array and String types.
 
 #### Receiving Strings
@@ -107,6 +105,7 @@ Sub GetErrorMessage(m_Session As Long, errorCode As Long, ByRef errorMsg As Stri
 
     status = niDMM_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
     errorMsg = StrConv(buffer(), vbUnicode)
+End Sub
 ```
 First note that the errorMsg ``char *`` argument is declared ``ByVal`` and as a ``LongPtr``. ``niDMM_GetError`` is first called with size set to 0 and a ``NULL`` pointer value, this will return the number of bytes needed for the buffer. Then ``ReDim`` is used to allocate the needed buffer and on the second call the pointer to this buffer is passed to the function using ``VarPtr(buffer(0))``.
 
