@@ -26,32 +26,101 @@ How to map datatypes in VBA Declare statements and additional conversion needs
 
 | IVI / VISA Datatype | Base C Type         | Visual Basic Type   | Conversion needs    |
 | ------------------- | ------------------- | ------------------- | ------------------- |
-| ``ViUInt64`` | ``unsigned __int64`` | ``ByVal LongLong`` | |
-| ``ViInt64`` | ``signed __int64`` | ``ByVal LongLong`` | |
-| ``ViUInt32`` | ``unsigned long`` | ``ByVal Long`` | |
-| ``ViInt32`` | ``signed long`` | ``ByVal Long`` | |
-| ``ViUInt16`` | ``unsigned short`` | ``ByVal Int`` | |
-| ``ViInt16`` | ``signed short `` | ``ByVal Int`` | |
-| ``ViUInt8`` | ``unsigned char`` | ``ByVal Byte`` | |
-| ``ViInt8`` | ``signed char `` | ``ByVal Byte`` | |
-| ``ViByte`` | ``unsigned char`` | ``ByVal Byte`` | |
-| ``ViChar`` | ``char `` | ``ByVal Byte`` | |
-| ``ViReal32`` | ``float`` | ``ByVal Single`` | |
-| ``ViReal64`` | ``double`` | ``ByVal Double`` | |
-| ``ViBoolean`` | ``unsigned short`` | ``ByVal Boolean`` | |
-| ``ViString`` | ``char \* `` | ``ByRef Byte()`` | Requires convertion To/From UNICODE | 
-| ``ViConstString`` | ``const char \* `` | ``ByRef String`` | UNICODE conversion seems to happen automatically in VBA7 | 
+| ``ViUInt64`` | ``unsigned __int64`` | ``LongLong`` | |
+| ``ViInt64`` | ``signed __int64`` | ``LongLong`` | |
+| ``ViUInt32`` | ``unsigned long`` | ``Long`` | |
+| ``ViInt32`` | ``signed long`` | ``Long`` | |
+| ``ViUInt16`` | ``unsigned short`` | ``Int`` | |
+| ``ViInt16`` | ``signed short `` | ``Int`` | |
+| ``ViUInt8`` | ``unsigned char`` | ``Byte`` | |
+| ``ViInt8`` | ``signed char `` | ``Byte`` | |
+| ``ViByte`` | ``unsigned char`` | ``Byte`` | |
+| ``ViChar`` | ``char `` | ``Byte`` | |
+| ``ViReal32`` | ``float`` | ``Single`` | |
+| ``ViReal64`` | ``double`` | ``Double`` | |
+| ``ViBoolean`` | ``unsigned short`` | ``Boolean`` | |
+| ``ViString`` | ``char \* `` | ``LongPtr`` | Pass Byte Array using ``VarPtr(aByte(LBound(aByte)))`` and convert to/from ``String`` using the ``StrConv`` function | 
+| ``ViConstString`` | ``const char \* `` | ``ByRef String`` | Unicode conversion happens automatically | 
 | ``ViStatus`` | ``signed long`` | ``Long`` | |
 | ``ViSession`` | ``unsigned long`` | ``Long`` | |
 
 ### Pointers
-to do
+In the VBA Declare statement you need to use ``ByVal`` to indicate a argument is passed **by value** and ``ByRef`` to when passed **by reference**. This means that in most cases you just need to use ``ByRef`` when in externally a pointer is required.
 
-### Arrays
-to do 
+So this C function declaraction 
+```C
+ViStatus _VI_FUNC niDMM_GetAttributeViReal64(ViSession vi, ViConstString channelName, ViAttr attributeId, ViReal64 *value);
+```
+Will translate into the following VBA Declare statement,
+```VBA
+Private Declare PtrSafe Function niDMM_GetAttributeViReal64 Lib "niDMM_64" ( _
+    ByVal vi As Long, _
+    ByVal channelName As String, _
+    ByVal attributeID As Long, _
+    ByRef value As Double _
+) As Long
+```
+*Note how ByRef is used on the ``value`` argument.*
+
+The main exception is when using arrays or other complex data structions. In this case you need to pass the pointer by value and dereference the pointer in VBA.
+Argument declaration for a C pointer to an array or complext data structure in the VBA Declare statement:
+```VBA
+    ByVal value As LongPtr
+```
+
+In C arrays are also just pointers to the first element of the array. you can use the following VBA statement to get access to this pointer:
+```VBA
+VarPtr( myArrayVarable( 0 ) )
+```
+Or if when you don't know the exact array bounds use the more generic:
+```VBA
+VarPtr( myArrayVarable( LBound( myArrayVarable ) ) )
+```
+
+See [VBA Internals: Getting Pointers | bytecomb](https://bytecomb.com/vba-internals-getting-pointers/) for a overview of how to get the pointers as LongPtr of common VBA varable types.
 
 ### Strings
-to do
+C Strings are stored as Byte Arrays ``char \*`` so we can use the same aproach as for arrays to receive a C style string from external code.
+But VBA uses Ninicode and wide characters for its ``String`` type so we also need to deal with the convertion between Byte Array and String types.
+
+#### Receiving Strings
+When receiving strings you typically need to pass the pointer to a pre allocated string of the right lenght to the C function. When the function returned you then need to use the ``StrConv`` function with the byte array to convert to Unicode.
+
+Example of receiving a string using the ``niDMM_GetError`` function:
+```VBA
+'ViStatus _VI_FUNC niDMM_GetError(ViSession vi, ViStatus *errorCode, ViInt32 bufferSize, ViChar description[]);
+Private Declare PtrSafe Function niDMM_GetError Lib "niDMM_64" ( _
+    ByVal vi As Long, _
+    ByRef errorCode As Long, _
+    ByVal bufferSize As Long, _
+    ByVal errMessage As LongPtr _
+) As Long
+
+Sub GetErrorMessage(m_Session As Long, errorCode As Long, ByRef errorMsg As String)
+    Dim status As Long
+    Dim size As Long
+    Dim buffer() As Byte
+    Dim errorMsg As String
+
+    size = niDMM_GetError(m_Session, errorCode, 0, 0)
+    ReDim buffer(size) As Byte
+
+    status = niDMM_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
+    errorMsg = StrConv(buffer(), vbUnicode)
+```
+First note that the errorMsg ``char \*`` argument is declared ``ByVal`` and as a ``LongPtr``. ``niDMM_GetError`` is first called with size set to 0 and a ``NULL`` pointer value, this will return the number of bytes needed for the buffer. Then ``ReDim`` is used to allocate the needed buffer and on the second call the pointer to this buffer is passed to the function using ``VarPtr(buffer(0))``.
+
+And as the final step ``errorMsg = StrConv(buffer(), vbUnicode)`` converts the C stype string to the Unicode String used by VBA.
+
+#### Sending Strings
+The ``StrConv`` function can also be used to convert from Unicode strings to C Style strings:
+```VBA
+buffer() = StrConv("StackOverflow", vbFromUnicode)
+```
+This statement converts a Unicode String to a C Style string stored in a Byte array. In the same way you can pass the pointer to this Byte array to a C function like so: ``VarPtr(buffer(0))``.
+
+**A Note on using the** ``ByRef str As String`` **declaration**
+VBA can handle the unicode convertion automatically when you define the argument using a ``ByRef String``. This works on most cases when you are dealing with input only arguments, typically defined as ``const char \*`` in C. As soon as you need to be able to pass a ``NULL`` pointer value you need to use the ``LongPtr`` and Byte array declaration method wich is typical when receiving strings. 
 
 ## VBA Resources
 - [Declare statement (VBA) | Microsoft Docs](https://docs.microsoft.com/en-us/office/vba/language/reference/user-interface-help/declare-statement)
