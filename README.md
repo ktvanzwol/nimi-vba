@@ -39,8 +39,9 @@ How to map datatypes in VBA Declare statements and additional conversion needs
 | ``ViReal32`` | ``float`` | ``Single`` | |
 | ``ViReal64`` | ``double`` | ``Double`` | |
 | ``ViBoolean`` | ``unsigned short`` | ``Boolean`` | |
-| ``ViString`` | ``char * `` | ``LongPtr`` | See [Using Pointers and Strings](#Using-Pointers-and-Strings) | 
-| ``ViConstString`` | ``const char * `` | ``ByRef String`` | See [Using the ByRef str As String declaration](#Using-the-ByRef-str-As-String-declaration) | 
+| ``ViString`` | ``char * `` | ``LongPtr`` or ``ByVal String`` | See [Using Pointers and Strings](#Using-Pointers-and-Strings) | 
+| ``ViConstString`` | ``const char * `` | ``ByVal String`` | See [Using the ByVal str As String declaration](#Using-the-ByVal-str-As-String-declaration) | 
+| ``ViRsrc`` | ``char * `` | ``LongPtr`` or ``ByVal String`` | See [Using Pointers and Strings](#Using-Pointers-and-Strings) | 
 | ``ViStatus`` | ``signed long`` | ``Long`` | |
 | ``ViSession`` | ``unsigned long`` | ``Long`` | |
 
@@ -118,8 +119,8 @@ buffer() = StrConv("StackOverflow", vbFromUnicode)
 ```
 This statement converts a Unicode String to a C Style string stored in a Byte array. In the same way you can pass the pointer to this Byte array to a C function like so: ``VarPtr(buffer(0))``.
 
-#### Using the ``ByRef str As String`` declaration
-VBA can handle the unicode convertion automatically when you define the argument using a ``ByRef String``. This works on most cases when you are dealing with input only arguments, typically defined as ``const char *`` in C. As soon as you need to be able to pass a ``NULL`` pointer value you need to use the more generic ``LongPtr`` and Byte array declaration method wich is typical when receiving strings. 
+#### Using the ``ByVal str As String`` declaration
+VBA can handle the unicode convertion automatically when you define the argument using a ``ByVal String``. This works on most cases when you are dealing with input only arguments, typically defined as ``const char *`` in C. As soon as you need to be able to pass a ``NULL`` pointer value you need to use the more generic ``LongPtr`` and Byte array declaration method wich is more typical when receiving strings.
 
 ## VBA Resources
 - [Declare statement (VBA) | Microsoft Docs](https://docs.microsoft.com/en-us/office/vba/language/reference/user-interface-help/declare-statement)
