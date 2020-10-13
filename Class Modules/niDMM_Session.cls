@@ -211,14 +211,14 @@ End Sub
 Private Sub ErrorHandler(errorCode As Long)
     Dim status As Long
     Dim size As Long
-    Dim buffer As String
+    Dim buffer() As Byte
     Dim errorMsg As String
  
     size = niDMM_GetError(m_Session, errorCode, 0, 0)
-    buffer = String(size - 1, vbNullChar)
+    ReDim buffer(size) As Byte
  
-    status = niDMM_GetError(m_Session, errorCode, size, StrPtr(buffer))
-    niTools_CStrPtrToStr size, StrPtr(buffer), errorMsg
+    status = niDMM_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
+    errorMsg = StrConv(buffer(), vbUnicode)
     
     niTools_RaiseError errorCode, errorMsg, "NI-DMM"
 End Sub

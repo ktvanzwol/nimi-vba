@@ -68,14 +68,14 @@ End Sub
 Private Sub ErrorHandler(errorCode As Long)
     Dim status As Long
     Dim size As Long
-    Dim buffer As String
+    Dim buffer() As Byte
     Dim errorMsg As String
        
     size = niModInst_GetExtendedErrorInfo(0, 0) + 1
-    buffer = String(size - 1, " ")
+    ReDim buffer(size) As Byte
     
-    status = niModInst_GetExtendedErrorInfo(size, StrPtr(buffer))
-    niTools_CStrPtrToStr size, StrPtr(buffer), errorMsg
+    status = niModInst_GetExtendedErrorInfo(size, VarPtr(buffer(0)))
+    errorMsg = StrConv(buffer(), vbUnicode)
     
     niTools_RaiseError errorCode, errorMsg, "niTools"
 End Sub
@@ -98,13 +98,13 @@ End Property
 
 Public Sub GetInstalledDeviceAttributeString(ByVal index As Long, ByVal attributeID As Long, ByRef attributeValue As String)
     Dim size As Long
-    Dim buffer As String
+    Dim buffer() As Byte
     
     size = niModInst_GetInstalledDeviceAttributeViString(m_Session, index, attributeID, 0, 0)
-    buffer = String(size - 1, vbNullChar)
+    ReDim buffer(size) As Byte
     
-    CheckError niModInst_GetInstalledDeviceAttributeViString(m_Session, index, attributeID, size, StrPtr(buffer))
-    niTools_CStrPtrToStr size, StrPtr(buffer), attributeValue
+    CheckError niModInst_GetInstalledDeviceAttributeViString(m_Session, index, attributeID, size, VarPtr(buffer(0)))
+    attributeValue = StrConv(buffer(), vbUnicode)
 End Sub
 
 Public Sub GetInstalledDeviceAttributeLong(ByVal index As Long, ByVal attributeID As Long, ByRef attributeValue As Long)

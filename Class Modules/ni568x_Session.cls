@@ -142,14 +142,14 @@ End Sub
 Private Sub ErrorHandler(errorCode As Long)
     Dim status As Long
     Dim size As Long
-    Dim buffer As String
+    Dim buffer() As Byte
     Dim errorMsg As String
         
     size = ni568x_GetError(m_Session, errorCode, 0, 0)
-    buffer = String(size - 1, "*")
+    ReDim buffer(size)
 
-    status = ni568x_GetError(m_Session, errorCode, 1024, StrPtr(buffer))
-    niTools_CStrPtrToStr size, StrPtr(buffer), errorMsg
+    status = ni568x_GetError(m_Session, errorCode, 1024, VarPtr(buffer(0)))
+    errorMsg = StrConv(buffer(), vbUnicode)
         
     niTools_RaiseError errorCode, errorMsg, "NI-568x", m_ResourceName
 End Sub
