@@ -10,28 +10,37 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' Attribute IDs
-Const NIRFSA_ATTR_ As Long = 0 ' Attribute constant defined privately, class property should be used to expose the attribute
+Const NIRFSA_ATTR_IQ_CARRIER_FREQUENCY As Long = 1150059
 
 'ViStatus _VI_FUNC niRFSA_init(ViRsrc resourceName, ViBoolean IDQuery, ViBoolean resetDevice, ViSession* vi);
-Private Declare PtrSafe Function niRFSA_init Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_init Lib "niRFSA_64" ( _
     ByVal resourceName As String, _
     ByVal IDQuery As Boolean, _
     ByVal resetDevice As Boolean, _
     ByRef vi As Long _
 ) As Long
 
+'ViStatus _VI_FUNC niRFSA_InitWithOptions(ViRsrc resourceName, ViBoolean IDQuery, ViBoolean reset, ViConstString optionString, ViSession* newVi);
+Private Declare PtrSafe Function niRFSA_InitWithOptions Lib "niRFSA_64" ( _
+    ByVal resourceName As String, _
+    ByVal IDQuery As Boolean, _
+    ByVal resetDevice As Boolean, _
+    ByVal optionString As String, _
+    ByRef vi As Long _
+) As Long
+
 'ViStatus _VI_FUNC niRFSA_close(ViSession vi);
-Private Declare PtrSafe Function niRFSA_close Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_close Lib "niRFSA_64" ( _
     ByVal vi As Long _
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_reset(ViSession vi);
-Private Declare PtrSafe Function niRFSA_reset Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_reset Lib "niRFSA_64" ( _
     ByVal vi As Long _
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViInt32(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt32 *value);
-Private Declare PtrSafe Function niRFSA_GetAttributeViInt32 Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_GetAttributeViInt32 Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -39,7 +48,7 @@ Private Declare PtrSafe Function niRFSA_GetAttributeViInt32 Lib "C:\Program File
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViInt32(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt32 value);
-Private Declare PtrSafe Function niRFSA_SetAttributeViInt32 Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_SetAttributeViInt32 Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -47,7 +56,7 @@ Private Declare PtrSafe Function niRFSA_SetAttributeViInt32 Lib "C:\Program File
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViInt64(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt64 *value);
-Private Declare PtrSafe Function niRFSA_GetAttributeViInt64 Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_GetAttributeViInt64 Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -55,7 +64,7 @@ Private Declare PtrSafe Function niRFSA_GetAttributeViInt64 Lib "C:\Program File
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViInt64(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt64 value);
-Private Declare PtrSafe Function niRFSA_SetAttributeViInt64 Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_SetAttributeViInt64 Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -63,7 +72,7 @@ Private Declare PtrSafe Function niRFSA_SetAttributeViInt64 Lib "C:\Program File
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViReal64(ViSession vi, ViConstString channelName, ViAttr attribute, ViReal64 *value);
-Private Declare PtrSafe Function niRFSA_GetAttributeViReal64 Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_GetAttributeViReal64 Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -71,7 +80,7 @@ Private Declare PtrSafe Function niRFSA_GetAttributeViReal64 Lib "C:\Program Fil
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViReal64(ViSession vi, ViConstString channelName, ViAttr attribute, ViReal64 value);
-Private Declare PtrSafe Function niRFSA_SetAttributeViReal64 Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_SetAttributeViReal64 Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -79,7 +88,7 @@ Private Declare PtrSafe Function niRFSA_SetAttributeViReal64 Lib "C:\Program Fil
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViString(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt32 bufSize, ViChar value[]);
-Private Declare PtrSafe Function niRFSA_GetAttributeViString Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_GetAttributeViString Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -88,7 +97,7 @@ Private Declare PtrSafe Function niRFSA_GetAttributeViString Lib "C:\Program Fil
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViString(ViSession vi, ViConstString channelName, ViAttr attribute, ViConstString value);
-Private Declare PtrSafe Function niRFSA_SetAttributeViString Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_SetAttributeViString Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -96,7 +105,7 @@ Private Declare PtrSafe Function niRFSA_SetAttributeViString Lib "C:\Program Fil
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViBoolean(ViSession vi, ViConstString channelName, ViAttr attribute, ViBoolean *value);
-Private Declare PtrSafe Function niRFSA_GetAttributeViBoolean Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_GetAttributeViBoolean Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -104,7 +113,7 @@ Private Declare PtrSafe Function niRFSA_GetAttributeViBoolean Lib "C:\Program Fi
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViBoolean(ViSession vi, ViConstString channelName, ViAttr attribute, ViBoolean value);
-Private Declare PtrSafe Function niRFSA_SetAttributeViBoolean Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_SetAttributeViBoolean Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelName As String, _
     ByVal attributeID As Long, _
@@ -112,7 +121,7 @@ Private Declare PtrSafe Function niRFSA_SetAttributeViBoolean Lib "C:\Program Fi
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetError(ViSession vi, ViStatus *errorCode, ViInt32 bufferSize, ViChar description[]);
-Private Declare PtrSafe Function niRFSA_GetError Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_GetError Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByRef errorCode As Long, _
     ByVal bufferSize As Long, _
@@ -120,34 +129,34 @@ Private Declare PtrSafe Function niRFSA_GetError Lib "C:\Program Files\IVI Found
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureRefClock(ViSession vi, ViConstString clockSource, ViReal64 refClockRate);
-Private Declare PtrSafe Function niRFSA_ConfigureRefClock Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_ConfigureRefClock Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal clockSource As String, _
     ByVal refClockRate As Double _
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureReferenceLevel(ViSession vi, ViConstString channelList, ViReal64 referenceLevel);
-Private Declare PtrSafe Function niRFSA_ConfigureReferenceLevel Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_ConfigureReferenceLevel Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelList As String, _
     ByVal referenceLevel As Double _
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureAcquisitionType(ViSession vi, ViInt32 acquisitionType);
-Private Declare PtrSafe Function niRFSA_ConfigureAcquisitionType Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_ConfigureAcquisitionType Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal acquisitionType As Long _
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureIQCarrierFrequency(ViSession vi, ViConstString channelList, ViReal64 carrierFrequency);
-Private Declare PtrSafe Function niRFSA_ConfigureIQCarrierFrequency Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_ConfigureIQCarrierFrequency Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelList As String, _
-    ByVal carrierFrequency As Double _
+    ByVal CarrierFrequency As Double _
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureNumberOfSamples(ViSession vi, ViConstString channelList, ViBoolean numberOfSamplesIsFinite, ViInt64 samplesPerRecord);
-Private Declare PtrSafe Function niRFSA_ConfigureNumberOfSamples Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_ConfigureNumberOfSamples Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelList As String, _
     ByVal numberOfSamplesIsFinite As Boolean, _
@@ -155,30 +164,32 @@ Private Declare PtrSafe Function niRFSA_ConfigureNumberOfSamples Lib "C:\Program
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureIQRate(ViSession vi, ViConstString channelList, ViReal64 iqRate);
-Private Declare PtrSafe Function niRFSA_ConfigureIQRate Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_ConfigureIQRate Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelList As String, _
-    ByVal iqRate As LongLong _
+    ByVal iqRate As Double _
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_ReadIQSingleRecordComplexF64(ViSession vi, ViConstString channelList, ViReal64 timeout, NIComplexNumber* data, ViInt64 dataArraySize, niRFSA_wfmInfo* wfmInfo);
-Private Declare PtrSafe Function niRFSA_ReadIQSingleRecordComplexF64 Lib "C:\Program Files\IVI Foundation\IVI\Bin\niRFSA_64.dll" ( _
+Private Declare PtrSafe Function niRFSA_ReadIQSingleRecordComplexF64 Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal channelList As String, _
     ByVal timeout As Double, _
-    ByRef data As NIComplexNumber, _
+    ByVal data As LongPtr, _
     ByVal dataArraySize As Long, _
-    ByRef wfmInfo As niRFSA_wfmInfo _
+    ByVal wfmInfo As LongPtr _
 ) As Long
 
 ' Internal session
 Private m_Session As Long
 Private m_ResourceName As String
+Private m_Channel As String
 
 ' initialize internal variables, call Init first to create a valid session
 Private Sub Class_Initialize()
     m_Session = 0
     m_ResourceName = ""
+    m_Channel = ""
 End Sub
 
 ' Automatically clear session when object gets destroyed
@@ -197,24 +208,24 @@ End Sub
 Private Sub ErrorHandler(errorCode As Long)
     Dim status As Long
     Dim size As Long
-    Dim buffer As String
+    Dim buffer() As Byte
     Dim errorMsg As String
     
     size = niRFSA_GetError(m_Session, errorCode, 0, 0)
-    buffer = String(size - 1, vbNullChar)
+    ReDim buffer(size) As Byte
  
-    status = niRFSA_GetError(m_Session, errorCode, size, StrPtr(buffer))
-    niTools_CStrPtrToStr size, StrPtr(buffer), errorMsg
+    status = niRFSA_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
+    errorMsg = StrConv(buffer(), vbUnicode)
     
     niTools_RaiseError errorCode, errorMsg, "NI-RFSA"
 End Sub
 
-Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean)
+Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean, optionString As String)
     ' Make sure session is closed before opening
     CloseSession
     
     m_ResourceName = resourceName
-    CheckError niRFSA_init(resourceName, IDQuery, reset, m_Session)
+    CheckError niRFSA_InitWithOptions(resourceName, IDQuery, reset, optionString, m_Session)
 End Sub
 
 Private Sub CloseSession()
@@ -223,6 +234,7 @@ Private Sub CloseSession()
     CheckError niRFSA_close(m_Session)
     m_Session = 0
     m_ResourceName = ""
+    m_Channel = ""
 End Sub
 
 Public Sub reset()
@@ -241,19 +253,41 @@ Public Sub ConfigureAcquisitionType(acquisitionType As Long)
     CheckError niRFSA_ConfigureAcquisitionType(m_Session, acquisitionType)
 End Sub
 
-Public Sub ConfigureIQCarrierFrequency(channelList As String, carrierFrequency As Double)
-    CheckError niRFSA_ConfigureIQCarrierFrequency(m_Session, channelList, carrierFrequency)
+Public Sub ConfigureIQCarrierFrequency(channelList As String, CarrierFrequency As Double)
+    CheckError niRFSA_ConfigureIQCarrierFrequency(m_Session, channelList, CarrierFrequency)
 End Sub
 
 Public Sub ConfigureNumberOfSamples(channelList As String, numberOfSamplesIsFinite As Boolean, samplesPerRecord As LongLong)
     CheckError niRFSA_ConfigureNumberOfSamples(m_Session, channelList, numberOfSamplesIsFinite, samplesPerRecord)
 End Sub
 
-Public Sub ConfigureIQRate(channelList As String, iqRate As LongLong)
+Public Sub ConfigureIQRate(channelList As String, iqRate As Double)
+    Debug.Print iqRate; " "; VarPtr(iqRate); " "; CDbl(VarPtr(iqRate))
     CheckError niRFSA_ConfigureIQRate(m_Session, channelList, iqRate)
 End Sub
 
-Public Sub ReadIQSingleRecordComplexF64(channelList As String, timeout As Double, ByRef data() As NIComplexNumber, ByRef wfmInfo As niRFSA_wfmInfo)
-    CheckError niRFSA_ReadIQSingleRecordComplexF64(m_Session, channelList, timeout, data(LBound(data)), UBound(data), wfmInfo)
+Public Sub ReadIQSingleRecordComplexF64(channelList As String, timeout As Double, ByRef data() As Double, ByRef wfmInfo As niRFSA_wfmInfo)
+    Dim length As Long
+    Dim lb As Long
+    
+    lb = LBound(data)
+    length = UBound(data) - lb
+    CheckError niRFSA_ReadIQSingleRecordComplexF64(m_Session, channelList, timeout, VarPtr(data(lb)), length, VarPtr(wfmInfo))
 End Sub
+
+Public Property Get ActiveChannel() As String
+    ActiveChannel = m_Channel
+End Property
+
+Public Property Let ActiveChannel(value As String)
+    m_Channel = value
+End Property
+
+Public Property Get IQCarrierFrequency() As Double
+    CheckError niRFSA_GetAttributeViReal64(m_Session, m_Channel, NIRFSA_ATTR_IQ_CARRIER_FREQUENCY, IQCarrierFrequency)
+End Property
+
+Public Property Let IQCarrierFrequency(value As Double)
+    CheckError niRFSA_SetAttributeViReal64(m_Session, m_Channel, NIRFSA_ATTR_IQ_CARRIER_FREQUENCY, value)
+End Property
 

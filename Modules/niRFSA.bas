@@ -17,13 +17,17 @@ Type niRFSA_wfmInfo
 End Type
 
 ' niRFSA Factory Method
-Public Function niRFSA_CreateSession(resourceName As String, Optional IDQuery As Boolean = True, Optional reset As Boolean = True) As niRFSA_Session
-    Dim session As niRFSA_Session
+Public Function niRFSA_CreateSession( _
+        resourceName As String, _
+        Optional IDQuery As Boolean = True, _
+        Optional reset As Boolean = True, _
+        Optional optionString As String = "" _
+    ) As niRFSA_Session
     
-    Set session = New niRFSA_Session
-    session.InitSession resourceName, IDQuery, reset
+    Dim Session As niRFSA_Session
     
-    Set niRFSA_CreateSession = session
+    Set Session = New niRFSA_Session
+    Session.InitSession resourceName, IDQuery, reset, optionString
+    
+    Set niRFSA_CreateSession = Session
 End Function
-
-
