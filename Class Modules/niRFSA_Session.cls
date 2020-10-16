@@ -39,6 +39,13 @@ Private Declare PtrSafe Function niRFSA_reset Lib "niRFSA_64" ( _
     ByVal vi As Long _
 ) As Long
 
+'ViStatus _VI_FUNC niRFSA_SelfCalibrate(ViSession vi, ViInt64 stepsToOmit);
+Private Declare PtrSafe Function niRFSA_SelfCalibrate Lib "niRFSA_64" ( _
+    ByVal vi As Long, _
+    ByVal stepsToOmit As LongLong _
+) As Long
+
+
 'ViStatus _VI_FUNC niRFSA_GetAttributeViInt32(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt32 *value);
 Private Declare PtrSafe Function niRFSA_GetAttributeViInt32 Lib "niRFSA_64" ( _
     ByVal vi As Long, _
@@ -241,6 +248,10 @@ Public Sub reset()
     CheckError niRFSA_reset(m_Session)
 End Sub
 
+Public Sub SelfCalibrate(Optional stepsToOmit As LongLong = NIRFSA_VAL_SELF_CAL_OMIT_NONE)
+    CheckError niRFSA_SelfCalibrate(m_Session, stepsToOmit)
+End Sub
+
 Public Sub ConfigureRefClock(clockSource As String, refClockRate As Double)
     CheckError niRFSA_ConfigureRefClock(m_Session, clockSource, refClockRate)
 End Sub
@@ -262,16 +273,15 @@ Public Sub ConfigureNumberOfSamples(channelList As String, numberOfSamplesIsFini
 End Sub
 
 Public Sub ConfigureIQRate(channelList As String, iqRate As Double)
-    Debug.Print iqRate; " "; VarPtr(iqRate); " "; CDbl(VarPtr(iqRate))
     CheckError niRFSA_ConfigureIQRate(m_Session, channelList, iqRate)
 End Sub
 
-Public Sub ReadIQSingleRecordComplexF64(channelList As String, timeout As Double, ByRef data() As Double, ByRef wfmInfo As niRFSA_wfmInfo)
+Public Sub ReadIQSingleRecordComplexF64(channelList As String, timeout As Double, ByRef data() As NIComplexNumber, ByRef wfmInfo As niRFSA_wfmInfo)
     Dim length As Long
     Dim lb As Long
     
     lb = LBound(data)
-    length = UBound(data) - lb
+    length = (UBound(data) - lb + 1)
     CheckError niRFSA_ReadIQSingleRecordComplexF64(m_Session, channelList, timeout, VarPtr(data(lb)), length, VarPtr(wfmInfo))
 End Sub
 
