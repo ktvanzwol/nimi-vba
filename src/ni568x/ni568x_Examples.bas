@@ -1,4 +1,4 @@
-Attribute VB_Name = "examples_ni568x"
+Attribute VB_Name = "ni568x_Examples"
 Option Explicit
 
 Sub MeasurePowerMeter()

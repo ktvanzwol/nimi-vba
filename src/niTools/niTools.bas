@@ -32,3 +32,4 @@ Public Sub niTools_ErrorMsgBox(e As ErrObject)
             "Microsoft Visual Basic for Applications", e.HelpFile, e.HelpContext
     End If
 End Sub
+

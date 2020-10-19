@@ -1,4 +1,4 @@
-Attribute VB_Name = "examples_niDMM"
+Attribute VB_Name = "niDMM_Examples"
 Option Explicit
 
 Sub MeasureDMM()

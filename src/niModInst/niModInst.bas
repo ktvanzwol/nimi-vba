@@ -16,12 +16,12 @@ Public Const NIMODINST_ATTR_MAX_PCIEXPRESS_LINK_WIDTH As Long = 18
 
 ' niModInst Factory Method
 Public Function niModInst_CreateSession(driver As String) As niModInst_Session
-    Dim session As niModInst_Session
+    Dim Session As niModInst_Session
     
-    Set session = New niModInst_Session
-    session.InitSession (driver)
+    Set Session = New niModInst_Session
+    Session.InitSession (driver)
     
-    Set niModInst_CreateSession = session
+    Set niModInst_CreateSession = Session
 End Function
 
 ' Utility function to get device names, most common use case for inModInst

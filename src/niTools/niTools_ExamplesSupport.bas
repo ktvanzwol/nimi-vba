@@ -1,4 +1,4 @@
-Attribute VB_Name = "examples_support"
+Attribute VB_Name = "niTools_ExamplesSupport"
 Option Explicit
 
 

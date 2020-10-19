@@ -1,4 +1,4 @@
-Attribute VB_Name = "example_niModInst"
+Attribute VB_Name = "niModInst_examples"
 Option Explicit
 
 Public Sub ListAllModularInstruments()

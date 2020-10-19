@@ -1,4 +1,4 @@
-Attribute VB_Name = "examples_niRFSA"
+Attribute VB_Name = "niRFSA_Examples"
 Option Explicit
 
 Sub niRFSA_MeasureIQPower()
