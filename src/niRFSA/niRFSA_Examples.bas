@@ -23,7 +23,7 @@ Sub niRFSA_MeasureIQPower()
     dIQRate = 1000000#
     llNumSamples = 1000000
     
-    Set cRFSA = niRFSA_CreateSession(sResourceName, optionString:="Simulate=1,DriverSetup=Model:5841")
+    Set cRFSA = niRFSA_CreateSession(sResourceName)
     With cRFSA
         .ConfigureAcquisitionType NIRFSA_VAL_IQ
         .ConfigureRefClock "OnboardClock", 10000000#
