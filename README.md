@@ -3,7 +3,7 @@ VBA7 Win64 wrapper for NI Modular Instrument C Drivers framework.
 
 ## nimi-vba C DLL Wrapping
 The nimi-vba uses the simularities between NI Modular instrunts drivers driven by IVI to implement a consistent VBA implementation.
-Each driver wrapper consists of two files a Module (.bas) and a Module Class (.cls). The framework depends on the VBA Declare statement to reference functions in the C Dlls
+Each driver wrapper consists of two files a Module and a Module Class. The framework depends on the VBA Declare statement to reference functions in the C Dlls
 
 The module file contains the public constants and Factory method for the Class. The class module implements a session class that manages the a driver session. when created the a session is opened and when the object instance goes out of scope the session is automatically clodes.
 
