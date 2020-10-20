@@ -67,9 +67,41 @@ Sub SelfCalibrate()
     
     sResourceName = "VST_5841_C1_S13"
     
-    Set cRFSA = niRFSA_CreateSession(sResourceName, optionString:="Simulate=1,DriverSetup=Model:5841")
-    cRFSA.SelfCalibrate
+    Set cRFSA = niRFSA_CreateSession(sResourceName)
+    cRFSA.SelfCalibrate NIRFSA_VAL_SELF_CAL_OMIT_NONE
           
 Error:
     If Err Then niTools_ErrorMsgBox Err
 End Sub
+
+Sub OptionStringAndAttributeTests()
+    Dim cRFSA As niRFSA_Session
+    Dim sResourceName As String
+    Dim ports As String
+    Dim selectedPort As String
+    Dim referenceLevel As Double
+    Dim acqType As niRFSA_AcquisitionType
+    
+    On Error GoTo Error
+    
+    sResourceName = "VST_5831_C1_S13"
+    
+    Set cRFSA = niRFSA_CreateSession(sResourceName, optionString:="Simulate=1,DriverSetup=Model:5831")
+    With cRFSA
+        .GetAttributeString "", NIRFSA_ATTR_AVAILABLE_PORTS, ports
+        .SetAttributeString "", NIRFSA_ATTR_SELECTED_PORTS, "if1"
+        .GetAttributeString "", NIRFSA_ATTR_SELECTED_PORTS, selectedPort
+        .SetAttributeDouble "", NIRFSA_ATTR_REFERENCE_LEVEL, 1.234
+        .GetAttributeDouble "", NIRFSA_ATTR_REFERENCE_LEVEL, referenceLevel
+        .SetAttributeLong "", NIRFSA_ATTR_ACQUISITION_TYPE, NIRFSA_VAL_SPECTRUM
+        .GetAttributeLong "", NIRFSA_ATTR_ACQUISITION_TYPE, acqType
+    End With
+    
+    Debug.Print "Available Ports  = "; ports
+    Debug.Print "Selected Port    = "; selectedPort
+    Debug.Print "Reference Level  ="; referenceLevel
+    Debug.Print "Acquisition Type = "; IIf(acqType = NIRFSA_VAL_IQ, "IQ", "Spectrum"); acqType
+Error:
+    If Err Then niTools_ErrorMsgBox Err
+End Sub
+
