@@ -10,7 +10,41 @@ Attribute VB_Exposed = False
 Option Explicit
 
 ' Attribute IDs
-Const NIRFSA_ATTR_IQ_CARRIER_FREQUENCY As Long = 1150059
+Public Enum niRFSA_AttributeIDs
+    NIRFSA_ATTR_ACQUISITION_TYPE = (1150000 + 1)
+    NIRFSA_ATTR_IQ_CARRIER_FREQUENCY = (1150000 + 59)
+    NIRFSA_ATTR_REFERENCE_LEVEL = (1150000 + 4)
+    NIRFSA_ATTR_REFERENCE_LEVEL_HEADROOM = (1150000 + 309)
+    NIRFSA_ATTR_ATTENUATION = (1150000 + 5)
+    NIRFSA_ATTR_RF_ATTENUATION_STEP_SIZE = (1150000 + 155)
+    NIRFSA_ATTR_DEVICE_CONFIGURATION_TEMPERATURE = (1150000 + 159)
+    NIRFSA_ATTR_AMPLITUDE_SETTLING = (1150000 + 163)
+    NIRFSA_ATTR_DIGITAL_GAIN = (1150000 + 301)
+    NIRFSA_ATTR_SELECTED_PORTS = (1150000 + 297)
+    NIRFSA_ATTR_AVAILABLE_PORTS = (1150000 + 306)
+End Enum
+
+'- NIRFSA_ATTR_ACQUISITION_TYPE Values -
+Public Enum niRFSA_AcquisitionType
+    NIRFSA_VAL_IQ = 100
+    NIRFSA_VAL_SPECTRUM = 101
+End Enum
+
+
+' - Values for SELF CAL steps -
+Public Enum niRFSA_SelfCalSteps
+    NIRFSA_VAL_SELF_CAL_OMIT_NONE = &H0
+    NIRFSA_VAL_SELF_CAL_PRESELECTOR_ALIGNMENT = &H1
+    NIRFSA_VAL_SELF_CAL_GAIN_REFERENCE = &H2
+    NIRFSA_VAL_SELF_CAL_IF_FLATNESS = &H4
+    NIRFSA_VAL_SELF_CAL_DIGITIZER_SELF_CAL = &H8
+    NIRFSA_VAL_SELF_CAL_LO_SELF_CAL = &H10
+    NIRFSA_VAL_SELF_CAL_AMPLITUDE_ACCURACY = &H20
+    NIRFSA_VAL_SELF_CAL_RESIDUAL_LO_POWER = &H40
+    NIRFSA_VAL_SELF_CAL_IMAGE_SUPPRESSION = &H80
+    NIRFSA_VAL_SELF_CAL_SYNTHESIZER_ALIGNMENT = &H100
+    NIRFSA_VAL_SELF_CAL_DC_OFFSET = &H200
+End Enum
 
 'ViStatus _VI_FUNC niRFSA_init(ViRsrc resourceName, ViBoolean IDQuery, ViBoolean resetDevice, ViSession* vi);
 Private Declare PtrSafe Function niRFSA_init Lib "niRFSA_64" ( _
@@ -44,7 +78,6 @@ Private Declare PtrSafe Function niRFSA_SelfCalibrate Lib "niRFSA_64" ( _
     ByVal vi As Long, _
     ByVal stepsToOmit As LongLong _
 ) As Long
-
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViInt32(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt32 *value);
 Private Declare PtrSafe Function niRFSA_GetAttributeViInt32 Lib "niRFSA_64" ( _
@@ -152,7 +185,7 @@ Private Declare PtrSafe Function niRFSA_ConfigureReferenceLevel Lib "niRFSA_64" 
 'ViStatus _VI_FUNC niRFSA_ConfigureAcquisitionType(ViSession vi, ViInt32 acquisitionType);
 Private Declare PtrSafe Function niRFSA_ConfigureAcquisitionType Lib "niRFSA_64" ( _
     ByVal vi As Long, _
-    ByVal acquisitionType As Long _
+    ByVal AcquisitionType As Long _
 ) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureIQCarrierFrequency(ViSession vi, ViConstString channelList, ViReal64 carrierFrequency);
@@ -190,13 +223,11 @@ Private Declare PtrSafe Function niRFSA_ReadIQSingleRecordComplexF64 Lib "niRFSA
 ' Internal session
 Private m_Session As Long
 Private m_ResourceName As String
-Private m_Channel As String
 
 ' initialize internal variables, call Init first to create a valid session
 Private Sub Class_Initialize()
     m_Session = 0
     m_ResourceName = ""
-    m_Channel = ""
 End Sub
 
 ' Automatically clear session when object gets destroyed
@@ -219,10 +250,10 @@ Private Sub ErrorHandler(errorCode As Long)
     Dim errorMsg As String
     
     size = niRFSA_GetError(m_Session, errorCode, 0, 0)
-    ReDim buffer(size) As Byte
+    ReDim buffer(size - 1) As Byte
  
     status = niRFSA_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
-    errorMsg = StrConv(buffer(), vbUnicode)
+    errorMsg = StrConv(LeftB(buffer(), size - 1), vbUnicode) 'Remove \0 character and convert to Unicode
     
     niTools_RaiseError errorCode, errorMsg, "NI-RFSA"
 End Sub
@@ -241,7 +272,6 @@ Private Sub CloseSession()
     CheckError niRFSA_close(m_Session)
     m_Session = 0
     m_ResourceName = ""
-    m_Channel = ""
 End Sub
 
 Public Sub reset()
@@ -260,8 +290,8 @@ Public Sub ConfigureReferenceLevel(channelList As String, referenceLevel As Doub
     CheckError niRFSA_ConfigureReferenceLevel(m_Session, channelList, referenceLevel)
 End Sub
 
-Public Sub ConfigureAcquisitionType(acquisitionType As Long)
-    CheckError niRFSA_ConfigureAcquisitionType(m_Session, acquisitionType)
+Public Sub ConfigureAcquisitionType(AcquisitionType As niRFSA_AcquisitionType)
+    CheckError niRFSA_ConfigureAcquisitionType(m_Session, AcquisitionType)
 End Sub
 
 Public Sub ConfigureIQCarrierFrequency(channelList As String, CarrierFrequency As Double)
@@ -285,19 +315,49 @@ Public Sub ReadIQSingleRecordComplexF64(channelList As String, timeout As Double
     CheckError niRFSA_ReadIQSingleRecordComplexF64(m_Session, channelList, timeout, VarPtr(data(lb)), length, VarPtr(wfmInfo))
 End Sub
 
-Public Property Get ActiveChannel() As String
-    ActiveChannel = m_Channel
-End Property
+Public Sub GetAttributeLong(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Long)
+    CheckError niRFSA_GetAttributeViInt32(m_Session, channelName, attributeID, value)
+End Sub
 
-Public Property Let ActiveChannel(value As String)
-    m_Channel = value
-End Property
+Public Sub SetAttributeLong(channelName As String, attributeID As niRFSA_AttributeIDs, value As Long)
+    CheckError niRFSA_SetAttributeViInt32(m_Session, channelName, attributeID, value)
+End Sub
 
-Public Property Get IQCarrierFrequency() As Double
-    CheckError niRFSA_GetAttributeViReal64(m_Session, m_Channel, NIRFSA_ATTR_IQ_CARRIER_FREQUENCY, IQCarrierFrequency)
-End Property
+Public Sub GetAttributeLongLong(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As LongLong)
+    CheckError niRFSA_GetAttributeViInt64(m_Session, channelName, attributeID, value)
+End Sub
 
-Public Property Let IQCarrierFrequency(value As Double)
-    CheckError niRFSA_SetAttributeViReal64(m_Session, m_Channel, NIRFSA_ATTR_IQ_CARRIER_FREQUENCY, value)
-End Property
+Public Sub SetAttributeLongLong(channelName As String, attributeID As niRFSA_AttributeIDs, value As LongLong)
+    CheckError niRFSA_SetAttributeViInt64(m_Session, channelName, attributeID, value)
+End Sub
 
+Public Sub GetAttributeDouble(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Double)
+    CheckError niRFSA_GetAttributeViReal64(m_Session, channelName, attributeID, value)
+End Sub
+
+Public Sub SetAttributeDouble(channelName As String, attributeID As niRFSA_AttributeIDs, value As Double)
+    CheckError niRFSA_SetAttributeViReal64(m_Session, channelName, attributeID, value)
+End Sub
+
+Public Sub GetAttributeString(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As String)
+    Dim size As Long
+    Dim buffer() As Byte
+    
+    size = niRFSA_GetAttributeViString(m_Session, channelName, attributeID, 0, 0)
+    ReDim buffer(size - 1) As Byte
+
+    CheckError niRFSA_GetAttributeViString(m_Session, channelName, attributeID, size, VarPtr(buffer(0)))
+    value = StrConv(LeftB(buffer(), size - 1), vbUnicode) ' Remove \0 character and convert to unicode
+End Sub
+
+Public Sub SetAttributeString(channelName As String, attributeID As niRFSA_AttributeIDs, value As String)
+    CheckError niRFSA_SetAttributeViString(m_Session, channelName, attributeID, value)
+End Sub
+
+Public Sub GetAttributeBoolean(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Boolean)
+    CheckError niRFSA_GetAttributeViBoolean(m_Session, channelName, attributeID, value)
+End Sub
+
+Public Sub SetAttributeBoolean(channelName As String, attributeID As niRFSA_AttributeIDs, value As Boolean)
+    CheckError niRFSA_SetAttributeViBoolean(m_Session, channelName, attributeID, value)
+End Sub
