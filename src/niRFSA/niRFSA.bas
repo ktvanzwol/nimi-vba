@@ -20,10 +20,10 @@ Public Function niRFSA_CreateSession( _
         Optional optionString As String = "" _
     ) As niRFSA_Session
     
-    Dim Session As niRFSA_Session
+    Dim session As niRFSA_Session
     
-    Set Session = New niRFSA_Session
-    Session.InitSession resourceName, IDQuery, reset, optionString
+    Set session = New niRFSA_Session
+    session.InitSession resourceName, IDQuery, reset, optionString
     
-    Set niRFSA_CreateSession = Session
+    Set niRFSA_CreateSession = session
 End Function

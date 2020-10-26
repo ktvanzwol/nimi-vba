@@ -92,8 +92,8 @@ Private Sub CloseSesion()
     m_Count = 0
 End Sub
 
-Public Property Get Count() As Long
-    Count = m_Count
+Public Property Get count() As Long
+    count = m_Count
 End Property
 
 Public Sub GetInstalledDeviceAttributeString(ByVal index As Long, ByVal attributeID As Long, ByRef attributeValue As String)

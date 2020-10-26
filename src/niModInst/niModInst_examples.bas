@@ -19,8 +19,8 @@ Public Sub ListAllModularInstruments()
     ws.range("D1").Value2 = "Chassis Number"
     ws.range("E1").Value2 = "Slot Number"
       
-    If mi.Count > 0 Then
-        For index = 0 To mi.Count - 1
+    If mi.count > 0 Then
+        For index = 0 To mi.count - 1
             mi.GetInstalledDeviceAttributeString index, NIMODINST_ATTR_DEVICE_NAME, sAttr
             ws.Cells(index + 2, 1).Value2 = sAttr
             
