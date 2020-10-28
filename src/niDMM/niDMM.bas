@@ -14,11 +14,11 @@ Public Const NIDMM_VAL_60_HERTZ As Double = 60#
 Public Const NIDMM_VAL_TIME_LIMIT_AUTO As Double = -1
 
 ' niDMM Factory Method
-Public Function niDMM_CreateSession(resourceName As String, Optional IDQuery As Boolean = True, Optional reset As Boolean = True) As niDMM_Session
+Public Function niDMM_CreateSession(resourceName As String, Optional IDQuery As Boolean = True, Optional Reset As Boolean = True) As niDMM_Session
     Dim session As niDMM_Session
     
     Set session = New niDMM_Session
-    session.InitSession resourceName, IDQuery, reset
+    session.InitSession resourceName, IDQuery, Reset
     
     Set niDMM_CreateSession = session
 End Function

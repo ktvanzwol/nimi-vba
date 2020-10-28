@@ -40,7 +40,7 @@ End Enum
 
 'ViStatus _VI_FUNC niDMM_init(ViRsrc resourceName, ViBoolean IDQuery, ViBoolean reset, ViSession *newVi);
 Private Declare PtrSafe Function niDMM_init Lib "niDMM_64" ( _
-    ByVal resourceName As String, ByVal IDQuery As Boolean, ByVal reset As Boolean, ByRef newVi As Long) As Long
+    ByVal resourceName As String, ByVal IDQuery As Boolean, ByVal Reset As Boolean, ByRef newVi As Long) As Long
 
 'ViStatus _VI_FUNC niDMM_close(ViSession vi);
 Private Declare PtrSafe Function niDMM_close Lib "niDMM_64" (ByVal vi As Long) As Long
@@ -137,12 +137,12 @@ Private Sub ErrorHandler(errorCode As Long)
     niTools_RaiseError errorCode, errorMsg, "NI-DMM"
 End Sub
 
-Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean)
+Public Sub InitSession(resourceName As String, IDQuery As Boolean, Reset As Boolean)
     ' Make sure session is closed before opening
     CloseSession
     
     m_ResourceName = resourceName
-    CheckError niDMM_init(resourceName, IDQuery, reset, m_Session)
+    CheckError niDMM_init(resourceName, IDQuery, Reset, m_Session)
 End Sub
 
 Private Sub CloseSession()
@@ -153,7 +153,7 @@ Private Sub CloseSession()
     m_ResourceName = ""
 End Sub
 
-Public Sub reset()
+Public Sub Reset()
     CheckError niDMM_reset(m_Session)
 End Sub
 

@@ -154,12 +154,12 @@ Private Sub ErrorHandler(errorCode As Long)
     niTools_RaiseError errorCode, errorMsg, "NI-568x", m_ResourceName
 End Sub
 
-Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean)
+Public Sub InitSession(resourceName As String, IDQuery As Boolean, Reset As Boolean)
     ' Make sure session is closed before opening
     CloseSession
     
     m_ResourceName = resourceName
-    CheckError ni568x_init(resourceName, IDQuery, reset, m_Session)
+    CheckError ni568x_init(resourceName, IDQuery, Reset, m_Session)
 End Sub
 
 Private Sub CloseSession()
@@ -170,7 +170,7 @@ Private Sub CloseSession()
     m_ResourceName = ""
 End Sub
 
-Public Sub reset()
+Public Sub Reset()
     CheckError ni568x_reset(m_Session)
 End Sub
 

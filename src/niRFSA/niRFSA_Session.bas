@@ -258,12 +258,12 @@ Private Sub ErrorHandler(errorCode As Long)
     niTools_RaiseError errorCode, errorMsg, "NI-RFSA"
 End Sub
 
-Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean, optionString As String)
+Public Sub InitSession(resourceName As String, IDQuery As Boolean, Reset As Boolean, optionString As String)
     ' Make sure session is closed before opening
     CloseSession
     
     m_ResourceName = resourceName
-    CheckError niRFSA_InitWithOptions(resourceName, IDQuery, reset, optionString, m_Session)
+    CheckError niRFSA_InitWithOptions(resourceName, IDQuery, Reset, optionString, m_Session)
 End Sub
 
 Private Sub CloseSession()
@@ -274,7 +274,7 @@ Private Sub CloseSession()
     m_ResourceName = ""
 End Sub
 
-Public Sub reset()
+Public Sub Reset()
     CheckError niRFSA_reset(m_Session)
 End Sub
 

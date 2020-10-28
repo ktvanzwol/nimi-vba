@@ -163,12 +163,12 @@ Private Sub ErrorHandler(errorCode As Long)
     niTools_RaiseError errorCode, errorMsg, "NI-RFSA"
 End Sub
 
-Public Sub InitSession(resourceName As String, IDQuery As Boolean, reset As Boolean, optionString As String)
+Public Sub InitSession(resourceName As String, IDQuery As Boolean, Reset As Boolean, optionString As String)
     ' Make sure session is closed before opening
     CloseSession
     
     m_ResourceName = resourceName
-    CheckError niRFSG_InitWithOptions(resourceName, IDQuery, reset, optionString, m_Session)
+    CheckError niRFSG_InitWithOptions(resourceName, IDQuery, Reset, optionString, m_Session)
     
     Set m_Playback = New niRFSG_Playback
     m_Playback.InitSession m_Session
@@ -184,7 +184,7 @@ Private Sub CloseSession()
     Set m_Playback = Nothing
 End Sub
 
-Public Sub reset()
+Public Sub Reset()
     CheckError niRFSG_reset(m_Session)
 End Sub
 

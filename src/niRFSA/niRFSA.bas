@@ -16,14 +16,14 @@ End Type
 Public Function niRFSA_CreateSession( _
         resourceName As String, _
         Optional IDQuery As Boolean = True, _
-        Optional reset As Boolean = True, _
+        Optional Reset As Boolean = True, _
         Optional optionString As String = "" _
     ) As niRFSA_Session
     
     Dim session As niRFSA_Session
     
     Set session = New niRFSA_Session
-    session.InitSession resourceName, IDQuery, reset, optionString
+    session.InitSession resourceName, IDQuery, Reset, optionString
     
     Set niRFSA_CreateSession = session
 End Function
