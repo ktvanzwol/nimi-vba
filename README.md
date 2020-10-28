@@ -44,6 +44,8 @@ How to map datatypes in VBA Declare statements and additional conversion needs
 | ``ViRsrc`` | ``char * `` | ``LongPtr`` or ``ByVal String`` | See [Using Pointers and Strings](#Using-Pointers-and-Strings) | 
 | ``ViStatus`` | ``signed long`` | ``Long`` | |
 | ``ViSession`` | ``unsigned long`` | ``Long`` | |
+| ``niRFmxInstrHandle`` | ``void *`` | ``LongPtr`` | |
+
 
 ## Using Pointers and Strings
 In the VBA Declare statement you need to use ``ByVal`` to indicate a argument is passed **by value** and ``ByRef`` to when passed **by reference**. This means that in most cases you just need to use ``ByRef`` when in externally a pointer is required.
