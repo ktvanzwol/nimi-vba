@@ -61,7 +61,7 @@ Private Sub ErrorHandler(errorCode As Long)
     niTools_RaiseError errorCode, errorMsg, "NI-RFSA"
 End Sub
 
-Public Sub InitSession(session As Long)
+Public Sub InitPlayback(session As Long)
     m_Session = session
 End Sub
 

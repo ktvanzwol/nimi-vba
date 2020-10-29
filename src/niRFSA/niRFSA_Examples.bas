@@ -9,7 +9,7 @@ Sub niRFSA_MeasureIQPower()
     Dim dIQRate As Double
     Dim llNumSamples As LongLong
     Dim lNumSamples As Long
-    Dim data() As NIComplexNumber
+    Dim data() As NIComplexDouble
     Dim wfmInfo As niRFSA_wfmInfo
     Dim i As Long
     Dim magnitudeSquared As Double
@@ -33,7 +33,7 @@ Sub niRFSA_MeasureIQPower()
         .ConfigureNumberOfSamples "", True, llNumSamples
     End With
     
-    ReDim data(CLng(llNumSamples) - 1) As NIComplexNumber
+    ReDim data(CLng(llNumSamples) - 1) As NIComplexDouble
     cRFSA.ReadIQSingleRecordComplexF64 "", 10, data, wfmInfo
     
     ' Do something useful with the data

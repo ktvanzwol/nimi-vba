@@ -171,7 +171,7 @@ Public Sub InitSession(resourceName As String, IDQuery As Boolean, Reset As Bool
     CheckError niRFSG_InitWithOptions(resourceName, IDQuery, Reset, optionString, m_Session)
     
     Set m_Playback = New niRFSG_Playback
-    m_Playback.InitSession m_Session
+    m_Playback.InitPlayback m_Session
     
 End Sub
 

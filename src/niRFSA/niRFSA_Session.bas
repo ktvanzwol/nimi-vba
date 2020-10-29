@@ -223,11 +223,22 @@ Private Declare PtrSafe Function niRFSA_ReadIQSingleRecordComplexF64 Lib "niRFSA
 ' Internal session
 Private m_Session As Long
 Private m_ResourceName As String
+Private m_RFmxOwnedSessiosn As Boolean
+
+
+Public Property Get InternalSession() As Long
+    InternalSession = m_Session
+End Property
+
+Public Property Get InternalResourceName() As String
+    InternalResourceName = m_ResourceName
+End Property
 
 ' initialize internal variables, call Init first to create a valid session
 Private Sub Class_Initialize()
     m_Session = 0
     m_ResourceName = ""
+    m_RFmxOwnedSessiosn = False
 End Sub
 
 ' Automatically clear session when object gets destroyed
@@ -263,15 +274,31 @@ Public Sub InitSession(resourceName As String, IDQuery As Boolean, Reset As Bool
     CloseSession
     
     m_ResourceName = resourceName
+    m_RFmxOwnedSessiosn = False
     CheckError niRFSA_InitWithOptions(resourceName, IDQuery, Reset, optionString, m_Session)
 End Sub
+
+Public Sub InitSessionForRFmxGetNIRFSASession(resourceName As String, session As Long)
+    ' Make sure session is closed before changing to new Session
+    CloseSession
+    
+    m_ResourceName = resourceName
+    m_Session = session
+    m_RFmxOwnedSessiosn = True
+End Sub
+
 
 Private Sub CloseSession()
     If m_Session = 0 Then Exit Sub
     
-    CheckError niRFSA_close(m_Session)
+    ' Do not close session if its owned by RFmx
+    If m_RFmxOwnedSessiosn = False Then
+        CheckError niRFSA_close(m_Session)
+    End If
+    
     m_Session = 0
     m_ResourceName = ""
+    m_RFmxOwnedSessiosn = False
 End Sub
 
 Public Sub Reset()
@@ -306,7 +333,7 @@ Public Sub ConfigureIQRate(channelList As String, iqRate As Double)
     CheckError niRFSA_ConfigureIQRate(m_Session, channelList, iqRate)
 End Sub
 
-Public Sub ReadIQSingleRecordComplexF64(channelList As String, timeout As Double, ByRef data() As NIComplexNumber, ByRef wfmInfo As niRFSA_wfmInfo)
+Public Sub ReadIQSingleRecordComplexF64(channelList As String, timeout As Double, ByRef data() As NIComplexDouble, ByRef wfmInfo As niRFSA_wfmInfo)
     Dim length As Long
     Dim lb As Long
     

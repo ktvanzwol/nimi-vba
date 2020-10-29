@@ -4,6 +4,7 @@ Option Explicit
 
 Function Example_GetNewOutputSheet(sheetName As String) As Worksheet
     Dim ws As Worksheet
+    Dim sh As Shape
     
     On Error GoTo Error:
     
@@ -15,6 +16,11 @@ Function Example_GetNewOutputSheet(sheetName As String) As Worksheet
 
     ws.UsedRange.Clear
     
+    For Each sh In ws.Shapes
+        sh.Delete
+    Next
+
+    
     Set Example_GetNewOutputSheet = ws
     Exit Function
 Error:
@@ -24,6 +30,8 @@ Error:
     
     Set Example_GetNewOutputSheet = ws
 End Function
+
+
 
 Public Sub ClearRows(startCell As range, columns As Long)
     Dim r As Long

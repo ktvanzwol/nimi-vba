@@ -1,9 +1,14 @@
 Attribute VB_Name = "niTools"
 Option Explicit
 
-Type NIComplexNumber
+Type NIComplexDouble
     real As Double
     imaginary As Double
+End Type
+
+Type NIComplexSingle
+    real As Single
+    imaginary As Single
 End Type
 
 ' VBA Error code used for NI Driver errors
