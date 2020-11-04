@@ -15,10 +15,15 @@ Sub Example_RFSG_SingleToneGeneration()
     dFrequency = 1000000000#
     dPowerLevel = -5#
     
-    Set cRFSG = niRFSG_CreateSession(sResourceName) ' , optionString:="Simulate=1,DriverSetup=Model:5841")
+    Set cRFSG = niRFSG_CreateSession(sResourceName, optionString:="Simulate=1,DriverSetup=Model:5841")
     With cRFSG
         .ConfigureRefClock "OnboardClock", 10000000#
-        .ConfigureRF dFrequency, dPowerLevel
+       
+       ' Replace Configure RF with the attributes
+       '.ConfigureRF dFrequency, dPowerLevel
+        .SetAttributeViReal64 "", NIRFSG_ATTR_FREQUENCY, dFrequency
+        .SetAttributeViReal64 "", NIRFSG_ATTR_POWER_LEVEL, dPowerLevel
+        
         .ConfigureGenerationMode NIRFSG_VAL_CW
         .ConfigureOutputEnabled True
     End With
@@ -77,7 +82,7 @@ Sub Example_RFSG_GenerateWaveform()
     With cRFSG
         .ConfigureRefClock "OnboardClock", 10000000#
         .ConfigureRF dCarrierFrequency, dPowerLevel
-        .SetAttributeDouble "", NIRFSG_ATTR_EXTERNAL_GAIN, -1 * dExternalAttinuation
+        .SetAttributeViReal64 "", NIRFSG_ATTR_EXTERNAL_GAIN, -1 * dExternalAttinuation
     End With
     
     cRFSG.Playback.ReadAndDownloadWaveformFromFile sFilePath, sWfmName
