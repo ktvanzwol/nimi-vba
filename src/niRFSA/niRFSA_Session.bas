@@ -9,216 +9,97 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-' Attribute IDs
-Public Enum niRFSA_AttributeIDs
-    NIRFSA_ATTR_ACQUISITION_TYPE = (1150000 + 1)
-    NIRFSA_ATTR_IQ_CARRIER_FREQUENCY = (1150000 + 59)
-    NIRFSA_ATTR_REFERENCE_LEVEL = (1150000 + 4)
-    NIRFSA_ATTR_REFERENCE_LEVEL_HEADROOM = (1150000 + 309)
-    NIRFSA_ATTR_ATTENUATION = (1150000 + 5)
-    NIRFSA_ATTR_RF_ATTENUATION_STEP_SIZE = (1150000 + 155)
-    NIRFSA_ATTR_DEVICE_CONFIGURATION_TEMPERATURE = (1150000 + 159)
-    NIRFSA_ATTR_AMPLITUDE_SETTLING = (1150000 + 163)
-    NIRFSA_ATTR_DIGITAL_GAIN = (1150000 + 301)
-    NIRFSA_ATTR_SELECTED_PORTS = (1150000 + 297)
-    NIRFSA_ATTR_AVAILABLE_PORTS = (1150000 + 306)
-End Enum
-
-'- NIRFSA_ATTR_ACQUISITION_TYPE Values -
-Public Enum niRFSA_AcquisitionType
-    NIRFSA_VAL_IQ = 100
-    NIRFSA_VAL_SPECTRUM = 101
-End Enum
-
-
-' - Values for SELF CAL steps -
-Public Enum niRFSA_SelfCalSteps
-    NIRFSA_VAL_SELF_CAL_OMIT_NONE = &H0
-    NIRFSA_VAL_SELF_CAL_PRESELECTOR_ALIGNMENT = &H1
-    NIRFSA_VAL_SELF_CAL_GAIN_REFERENCE = &H2
-    NIRFSA_VAL_SELF_CAL_IF_FLATNESS = &H4
-    NIRFSA_VAL_SELF_CAL_DIGITIZER_SELF_CAL = &H8
-    NIRFSA_VAL_SELF_CAL_LO_SELF_CAL = &H10
-    NIRFSA_VAL_SELF_CAL_AMPLITUDE_ACCURACY = &H20
-    NIRFSA_VAL_SELF_CAL_RESIDUAL_LO_POWER = &H40
-    NIRFSA_VAL_SELF_CAL_IMAGE_SUPPRESSION = &H80
-    NIRFSA_VAL_SELF_CAL_SYNTHESIZER_ALIGNMENT = &H100
-    NIRFSA_VAL_SELF_CAL_DC_OFFSET = &H200
-End Enum
-
 'ViStatus _VI_FUNC niRFSA_init(ViRsrc resourceName, ViBoolean IDQuery, ViBoolean resetDevice, ViSession* vi);
 Private Declare PtrSafe Function niRFSA_init Lib "niRFSA_64" ( _
-    ByVal resourceName As String, _
-    ByVal IDQuery As Boolean, _
-    ByVal resetDevice As Boolean, _
-    ByRef vi As Long _
-) As Long
+    ByVal resourceName As String, ByVal IDQuery As Boolean, ByVal resetDevice As Boolean, ByRef vi As Long) As Long
 
 'ViStatus _VI_FUNC niRFSA_InitWithOptions(ViRsrc resourceName, ViBoolean IDQuery, ViBoolean reset, ViConstString optionString, ViSession* newVi);
 Private Declare PtrSafe Function niRFSA_InitWithOptions Lib "niRFSA_64" ( _
-    ByVal resourceName As String, _
-    ByVal IDQuery As Boolean, _
-    ByVal resetDevice As Boolean, _
-    ByVal optionString As String, _
-    ByRef vi As Long _
-) As Long
+    ByVal resourceName As String, ByVal IDQuery As Boolean, ByVal resetDevice As Boolean, ByVal optionString As String, ByRef vi As Long) As Long
 
 'ViStatus _VI_FUNC niRFSA_close(ViSession vi);
 Private Declare PtrSafe Function niRFSA_close Lib "niRFSA_64" ( _
-    ByVal vi As Long _
-) As Long
+    ByVal vi As Long) As Long
 
 'ViStatus _VI_FUNC niRFSA_reset(ViSession vi);
 Private Declare PtrSafe Function niRFSA_reset Lib "niRFSA_64" ( _
-    ByVal vi As Long _
-) As Long
+    ByVal vi As Long) As Long
 
 'ViStatus _VI_FUNC niRFSA_SelfCalibrate(ViSession vi, ViInt64 stepsToOmit);
 Private Declare PtrSafe Function niRFSA_SelfCalibrate Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal stepsToOmit As LongLong _
-) As Long
+    ByVal vi As Long, ByVal stepsToOmit As LongLong) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViInt32(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt32 *value);
 Private Declare PtrSafe Function niRFSA_GetAttributeViInt32 Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByRef value As Long _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByRef value As Long) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViInt32(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt32 value);
 Private Declare PtrSafe Function niRFSA_SetAttributeViInt32 Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByVal value As Long _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByVal value As Long) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViInt64(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt64 *value);
 Private Declare PtrSafe Function niRFSA_GetAttributeViInt64 Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByRef value As LongLong _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByRef value As LongLong) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViInt64(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt64 value);
 Private Declare PtrSafe Function niRFSA_SetAttributeViInt64 Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByVal value As LongLong _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByVal value As LongLong) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViReal64(ViSession vi, ViConstString channelName, ViAttr attribute, ViReal64 *value);
 Private Declare PtrSafe Function niRFSA_GetAttributeViReal64 Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByRef value As Double _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByRef value As Double) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViReal64(ViSession vi, ViConstString channelName, ViAttr attribute, ViReal64 value);
 Private Declare PtrSafe Function niRFSA_SetAttributeViReal64 Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByVal value As Double _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByVal value As Double) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViString(ViSession vi, ViConstString channelName, ViAttr attribute, ViInt32 bufSize, ViChar value[]);
 Private Declare PtrSafe Function niRFSA_GetAttributeViString Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByVal bufSize As Long, _
-    ByVal value As LongPtr _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByVal bufSize As Long, ByVal value As LongPtr) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViString(ViSession vi, ViConstString channelName, ViAttr attribute, ViConstString value);
 Private Declare PtrSafe Function niRFSA_SetAttributeViString Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByVal value As String _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByVal value As String) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetAttributeViBoolean(ViSession vi, ViConstString channelName, ViAttr attribute, ViBoolean *value);
 Private Declare PtrSafe Function niRFSA_GetAttributeViBoolean Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByRef value As Boolean _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByRef value As Boolean) As Long
 
 'ViStatus _VI_FUNC niRFSA_SetAttributeViBoolean(ViSession vi, ViConstString channelName, ViAttr attribute, ViBoolean value);
 Private Declare PtrSafe Function niRFSA_SetAttributeViBoolean Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelName As String, _
-    ByVal attributeID As Long, _
-    ByVal value As Boolean _
-) As Long
+    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByVal value As Boolean) As Long
 
 'ViStatus _VI_FUNC niRFSA_GetError(ViSession vi, ViStatus *errorCode, ViInt32 bufferSize, ViChar description[]);
 Private Declare PtrSafe Function niRFSA_GetError Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByRef errorCode As Long, _
-    ByVal bufferSize As Long, _
-    ByVal errMessage As LongPtr _
-) As Long
+    ByVal vi As Long, ByRef errorCode As Long, ByVal bufferSize As Long, ByVal errMessage As LongPtr) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureRefClock(ViSession vi, ViConstString clockSource, ViReal64 refClockRate);
 Private Declare PtrSafe Function niRFSA_ConfigureRefClock Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal clockSource As String, _
-    ByVal refClockRate As Double _
-) As Long
+    ByVal vi As Long, ByVal clockSource As String, ByVal refClockRate As Double) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureReferenceLevel(ViSession vi, ViConstString channelList, ViReal64 referenceLevel);
 Private Declare PtrSafe Function niRFSA_ConfigureReferenceLevel Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelList As String, _
-    ByVal referenceLevel As Double _
-) As Long
+    ByVal vi As Long, ByVal channelList As String, ByVal referenceLevel As Double) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureAcquisitionType(ViSession vi, ViInt32 acquisitionType);
 Private Declare PtrSafe Function niRFSA_ConfigureAcquisitionType Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal AcquisitionType As Long _
-) As Long
+    ByVal vi As Long, ByVal AcquisitionType As Long) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureIQCarrierFrequency(ViSession vi, ViConstString channelList, ViReal64 carrierFrequency);
 Private Declare PtrSafe Function niRFSA_ConfigureIQCarrierFrequency Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelList As String, _
-    ByVal CarrierFrequency As Double _
-) As Long
+    ByVal vi As Long, ByVal channelList As String, ByVal CarrierFrequency As Double) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureNumberOfSamples(ViSession vi, ViConstString channelList, ViBoolean numberOfSamplesIsFinite, ViInt64 samplesPerRecord);
 Private Declare PtrSafe Function niRFSA_ConfigureNumberOfSamples Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelList As String, _
-    ByVal numberOfSamplesIsFinite As Boolean, _
-    ByVal samplesPerRecord As LongLong _
-) As Long
+    ByVal vi As Long, ByVal channelList As String, ByVal numberOfSamplesIsFinite As Boolean, ByVal samplesPerRecord As LongLong) As Long
 
 'ViStatus _VI_FUNC niRFSA_ConfigureIQRate(ViSession vi, ViConstString channelList, ViReal64 iqRate);
 Private Declare PtrSafe Function niRFSA_ConfigureIQRate Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelList As String, _
-    ByVal iqRate As Double _
-) As Long
+    ByVal vi As Long, ByVal channelList As String, ByVal iqRate As Double) As Long
 
 'ViStatus _VI_FUNC niRFSA_ReadIQSingleRecordComplexF64(ViSession vi, ViConstString channelList, ViReal64 timeout, NIComplexNumber* data, ViInt64 dataArraySize, niRFSA_wfmInfo* wfmInfo);
 Private Declare PtrSafe Function niRFSA_ReadIQSingleRecordComplexF64 Lib "niRFSA_64" ( _
-    ByVal vi As Long, _
-    ByVal channelList As String, _
-    ByVal timeout As Double, _
-    ByVal data As LongPtr, _
-    ByVal dataArraySize As Long, _
-    ByVal wfmInfo As LongPtr _
-) As Long
+    ByVal vi As Long, ByVal channelList As String, ByVal timeout As Double, ByVal data As LongPtr, ByVal dataArraySize As Long, ByVal wfmInfo As LongPtr) As Long
 
 ' Internal session
 Private m_Session As Long
@@ -342,31 +223,31 @@ Public Sub ReadIQSingleRecordComplexF64(channelList As String, timeout As Double
     CheckError niRFSA_ReadIQSingleRecordComplexF64(m_Session, channelList, timeout, VarPtr(data(lb)), length, VarPtr(wfmInfo))
 End Sub
 
-Public Sub GetAttributeLong(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Long)
+Public Sub GetAttributeViInt32(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Long)
     CheckError niRFSA_GetAttributeViInt32(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeLong(channelName As String, attributeID As niRFSA_AttributeIDs, value As Long)
+Public Sub SetAttributeViInt32(channelName As String, attributeID As niRFSA_AttributeIDs, value As Long)
     CheckError niRFSA_SetAttributeViInt32(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeLongLong(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As LongLong)
+Public Sub GetAttributeViInt64(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As LongLong)
     CheckError niRFSA_GetAttributeViInt64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeLongLong(channelName As String, attributeID As niRFSA_AttributeIDs, value As LongLong)
+Public Sub SetAttributeViInt64(channelName As String, attributeID As niRFSA_AttributeIDs, value As LongLong)
     CheckError niRFSA_SetAttributeViInt64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeDouble(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Double)
+Public Sub GetAttributeViReal64(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Double)
     CheckError niRFSA_GetAttributeViReal64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeDouble(channelName As String, attributeID As niRFSA_AttributeIDs, value As Double)
+Public Sub SetAttributeViReal64(channelName As String, attributeID As niRFSA_AttributeIDs, value As Double)
     CheckError niRFSA_SetAttributeViReal64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeString(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As String)
+Public Sub GetAttributeViString(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As String)
     Dim size As Long
     Dim buffer() As Byte
     
@@ -377,14 +258,14 @@ Public Sub GetAttributeString(channelName As String, attributeID As niRFSA_Attri
     value = StrConv(LeftB(buffer(), size - 1), vbUnicode) ' Remove \0 character and convert to unicode
 End Sub
 
-Public Sub SetAttributeString(channelName As String, attributeID As niRFSA_AttributeIDs, value As String)
+Public Sub SetAttributeViString(channelName As String, attributeID As niRFSA_AttributeIDs, value As String)
     CheckError niRFSA_SetAttributeViString(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeBoolean(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Boolean)
+Public Sub GetAttributeViBoolean(channelName As String, attributeID As niRFSA_AttributeIDs, ByRef value As Boolean)
     CheckError niRFSA_GetAttributeViBoolean(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeBoolean(channelName As String, attributeID As niRFSA_AttributeIDs, value As Boolean)
+Public Sub SetAttributeViBoolean(channelName As String, attributeID As niRFSA_AttributeIDs, value As Boolean)
     CheckError niRFSA_SetAttributeViBoolean(m_Session, channelName, attributeID, value)
 End Sub
