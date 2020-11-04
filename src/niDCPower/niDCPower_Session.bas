@@ -9,43 +9,6 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-' Attribute IDs
-' Note: in header files
-' IVI_SPECIFIC_PUBLIC_ATTR_BASE = 1150000
-' IVI_CLASS_PUBLIC_ATTR_BASE = 1250000
-Public Enum niDCPower_AttributeIDs
-    NIDCPOWER_ATTR_SOURCE_DELAY = (1150000 + 51)
-End Enum
-
-' Measurement Functions
-Public Enum niDCPower_SourceMode
-    NIDCPOWER_VAL_SINGLE_POINT = 1020
-    NIDCPOWER_VAL_SEQUENCE = 1021
-End Enum
-
-Public Enum niDCPower_OutputFunction
-    NIDCPOWER_VAL_DC_VOLTAGE = 1006     'Sets the output function to DC voltage.
-    NIDCPOWER_VAL_DC_CURRENT = 1007     'Sets the output function to DC current.
-    NIDCPOWER_VAL_PULSE_VOLTAGE = 1049  'Sets the output function to pulse voltage.
-    NIDCPOWER_VAL_PULSE_CURRENT = 1050  'Sets the output function to pulse current.
-End Enum
-
-'/*- Defined values for attributes -*/
-'/*-   NIDCPOWER_ATTR_CURRENT_LIMIT_BEHAVIOR -*/
-Public Enum niDCPower_CurrentLimitBehavior
-    NIDCPOWER_VAL_CURRENT_REGULATE = 0
-    NIDCPOWER_VAL_CURRENT_TRIP = 1
-End Enum
-
-Public Enum niDCPower_Events
-    NIDCPOWER_VAL_SOURCE_COMPLETE_EVENT = 1030              'Waits for the Source Complete event.
-    NIDCPOWER_VAL_MEASURE_COMPLETE_EVENT = 1031             'Waits for the Measure Complete event.
-    NIDCPOWER_VAL_SEQUENCE_ITERATION_COMPLETE_EVENT = 1032  'Waits for the Sequence Iteration Complete event.
-    NIDCPOWER_VAL_SEQUENCE_ENGINE_DONE_EVENT = 1033         'Waits for the Sequence Engine Done event.
-    NIDCPOWER_VAL_PULSE_COMPLETE_EVENT = 1051               'Waits for the Pulse Complete event.
-    NIDCPOWER_VAL_READY_FOR_PULSE_TRIGGER_EVENT = 1052      'Waits for the Ready for Pulse Trigger event.
-End Enum
-
 'ViStatus niDCPower_InitializeWithChannels(ViRsrc resourceName, ViConstString channels, ViBoolean reset, ViConstString optionString, ViSession *vi);
 Private Declare PtrSafe Function niDCPower_InitializeWithChannels Lib "niDCPower_64" ( _
     ByVal resourceName As String, ByVal channels As String, ByVal Reset As Boolean, ByVal optionString As String, ByRef vi As Long) As Long
@@ -137,6 +100,10 @@ Private Declare PtrSafe Function niDCPower_QueryInCompliance Lib "niDCPower_64" 
 Private Declare PtrSafe Function niDCPower_MeasureMultiple Lib "niDCPower_64" ( _
     ByVal vi As Long, ByVal channelName As String, ByVal voltageMeasurements As LongPtr, ByVal currentMeasurements As LongPtr) As Long
 
+'ViStatus niDCPower_ConfigureOutputEnabled(ViSession vi,  ViConstString channelName, ViBoolean outputEnabled);
+Private Declare PtrSafe Function niDCPower_ConfigureOutputEnabled Lib "niDCPower_64" ( _
+    ByVal vi As Long, ByVal channelName As String, ByVal outputEnabled As Boolean) As Long
+
 ' Internal session
 Private m_Session As Long
 Private m_ResourceName As String
@@ -167,10 +134,10 @@ Private Sub ErrorHandler(errorCode As Long)
     Dim errorMsg As String
  
     size = niDCPower_GetError(m_Session, errorCode, 0, 0)
-    ReDim buffer(size) As Byte
+    ReDim buffer(size - 1) As Byte
  
     status = niDCPower_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
-    errorMsg = StrConv(buffer(), vbUnicode)
+    errorMsg = StrConv(LeftB(buffer(), size - 1), vbUnicode) 'Remove \0 character and convert to Unicode
     
     niTools_RaiseError errorCode, errorMsg, "NI-DCPower"
 End Sub
@@ -195,31 +162,31 @@ Public Sub Reset()
     CheckError niDCPower_reset(m_Session)
 End Sub
 
-Public Sub GetAttributeLong(channelName As String, attributeID As niDCPower_AttributeIDs, ByRef value As Long)
+Public Sub GetAttributeViInt32(channelName As String, attributeID As niDCPower_AttributeIDs, ByRef value As Long)
     CheckError niDCPower_GetAttributeViInt32(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeLong(channelName As String, attributeID As niDCPower_AttributeIDs, value As Long)
+Public Sub SetAttributeViInt32(channelName As String, attributeID As niDCPower_AttributeIDs, value As Long)
     CheckError niDCPower_SetAttributeViInt32(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeDouble(channelName As String, attributeID As niDCPower_AttributeIDs, ByRef value As Double)
+Public Sub GetAttributeViReal64(channelName As String, attributeID As niDCPower_AttributeIDs, ByRef value As Double)
     CheckError niDCPower_GetAttributeViReal64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeDouble(channelName As String, attributeID As niDCPower_AttributeIDs, value As Double)
+Public Sub SetAttributeViReal64(channelName As String, attributeID As niDCPower_AttributeIDs, value As Double)
     CheckError niDCPower_SetAttributeViReal64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeBoolean(channelName As String, attributeID As niDCPower_AttributeIDs, ByRef value As Boolean)
+Public Sub GetAttributeViBoolean(channelName As String, attributeID As niDCPower_AttributeIDs, ByRef value As Boolean)
     CheckError niDCPower_GetAttributeViBoolean(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeBoolean(channelName As String, attributeID As niDCPower_AttributeIDs, value As Boolean)
+Public Sub SetAttributeViBoolean(channelName As String, attributeID As niDCPower_AttributeIDs, value As Boolean)
     CheckError niDCPower_SetAttributeViBoolean(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeString(channelName As String, attributeID As niDCPower_AttributeIDs, ByRef value As String)
+Public Sub GetAttributeViString(channelName As String, attributeID As niDCPower_AttributeIDs, ByRef value As String)
     Dim size As Long
     Dim buffer() As Byte
     
@@ -230,7 +197,7 @@ Public Sub GetAttributeString(channelName As String, attributeID As niDCPower_At
     value = StrConv(LeftB(buffer(), size - 1), vbUnicode) ' Remove \0 character and convert to unicode
 End Sub
 
-Public Sub SetAttributeString(channelName As String, attributeID As niDCPower_AttributeIDs, value As String)
+Public Sub SetAttributeViString(channelName As String, attributeID As niDCPower_AttributeIDs, value As String)
     CheckError niDCPower_SetAttributeViString(m_Session, channelName, attributeID, value)
 End Sub
 
@@ -282,4 +249,8 @@ Public Sub MeasureMultiple(channelName, ByRef voltageMeasurement() As Double, By
      CheckError niDCPower_MeasureMultiple(m_Session, channelName, _
                     VarPtr(voltageMeasurement(LBound(voltageMeasurement))), _
                     VarPtr(currentMeasurement(LBound(currentMeasurement))))
+End Sub
+
+Public Sub ConfigureOutputEnabled(channelName As String, outputEnabled As Boolean)
+    CheckError niDCPower_ConfigureOutputEnabled(m_Session, channelName, outputEnabled)
 End Sub
