@@ -9,35 +9,6 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-' Attribute IDs
-' Note: in header files
-' IVI_SPECIFIC_PUBLIC_ATTR_BASE = 1150000
-' IVI_CLASS_PUBLIC_ATTR_BASE = 1250000
-Public Enum niDMM_AttributeIDs
-    NIDMM_ATTR_RESOLUTION_ABSOLUTE = (1250000 + 8)
-    NIDMM_ATTR_POWERLINE_FREQ = (1250000 + 333)
-End Enum
-
-' Measurement Functions
-Public Enum niDMM_MeasurementFunction
-    NIDMM_VAL_DC_VOLTS = 1                'DC Voltage                     All
-    NIDMM_VAL_AC_VOLTS = 2                'AC Voltage with AC Coupling    All
-    NIDMM_VAL_DC_CURRENT = 3              'DC Current                     All
-    NIDMM_VAL_AC_CURRENT = 4              'AC Current                     All
-    NIDMM_VAL_2_WIRE_RES = 5              '2-Wire Resistance              All
-    NIDMM_VAL_4_WIRE_RES = 101            '4-Wire Resistance              NI 4060, NI 4065, NI 4070/4071/4072, NI 4080/4081/4082
-    NIDMM_VAL_FREQ = 104                  'Frequency                      NI 4070/4071/4072 and NI 4080/4081/4082
-    NIDMM_VAL_PERIOD = 105                'Period                         NI 4070/4071/4072 and NI 4080/4081/4082
-    NIDMM_VAL_TEMPERATURE = 108           'Temperature
-    NIDMM_VAL_AC_VOLTS_DC_COUPLED = 1001  'AC Voltage with DC Coupling    NI 4070/4071/4072 and NI 4080/4081/4082
-    NIDMM_VAL_DIODE = 1002                'Diode                          All
-    NIDMM_VAL_WAVEFORM_VOLTAGE = 1003     'Waveform Voltage               NI 4070/4071/4072 and NI 4080/4081/4082
-    NIDMM_VAL_WAVEFORM_CURRENT = 1004     'Waveform Current               NI 4070/4071/4072 and NI 4080/4081/4082
-    NIDMM_VAL_CAPACITANCE = 1005          'Capacitance                    NI 4072 and NI 4082
-    NIDMM_VAL_INDUCTANCE = 1006           'Inductance                     NI 4072 and NI 4082
-End Enum
-
-
 'ViStatus _VI_FUNC niDMM_init(ViRsrc resourceName, ViBoolean IDQuery, ViBoolean reset, ViSession *newVi);
 Private Declare PtrSafe Function niDMM_init Lib "niDMM_64" ( _
     ByVal resourceName As String, ByVal IDQuery As Boolean, ByVal Reset As Boolean, ByRef newVi As Long) As Long
@@ -129,10 +100,10 @@ Private Sub ErrorHandler(errorCode As Long)
     Dim errorMsg As String
  
     size = niDMM_GetError(m_Session, errorCode, 0, 0)
-    ReDim buffer(size) As Byte
+    ReDim buffer(size - 1) As Byte
  
     status = niDMM_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
-    errorMsg = StrConv(buffer(), vbUnicode)
+    errorMsg = StrConv(LeftB(buffer(), size - 1), vbUnicode) 'Remove \0 character and convert to Unicode
     
     niTools_RaiseError errorCode, errorMsg, "NI-DMM"
 End Sub
@@ -173,31 +144,31 @@ Public Sub Read(ByRef reading As Double, Optional maxTime As Long = NIDMM_VAL_TI
     CheckError niDMM_Read(m_Session, maxTime, reading)
 End Sub
 
-Public Sub GetAttributeLong(channelName As String, attributeID As niDMM_AttributeIDs, ByRef value As Long)
+Public Sub GetAttributeViInt32(channelName As String, attributeID As niDMM_AttributeIDs, ByRef value As Long)
     CheckError niDMM_GetAttributeViInt32(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeLong(channelName As String, attributeID As niDMM_AttributeIDs, value As Long)
+Public Sub SetAttributeViInt32(channelName As String, attributeID As niDMM_AttributeIDs, value As Long)
     CheckError niDMM_SetAttributeViInt32(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeDouble(channelName As String, attributeID As niDMM_AttributeIDs, ByRef value As Double)
+Public Sub GetAttributeViReal64(channelName As String, attributeID As niDMM_AttributeIDs, ByRef value As Double)
     CheckError niDMM_GetAttributeViReal64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeDouble(channelName As String, attributeID As niDMM_AttributeIDs, value As Double)
+Public Sub SetAttributeViReal64(channelName As String, attributeID As niDMM_AttributeIDs, value As Double)
     CheckError niDMM_SetAttributeViReal64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeBoolean(channelName As String, attributeID As niDMM_AttributeIDs, ByRef value As Boolean)
+Public Sub GetAttributeViBoolean(channelName As String, attributeID As niDMM_AttributeIDs, ByRef value As Boolean)
     CheckError niDMM_GetAttributeViBoolean(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeBoolean(channelName As String, attributeID As niDMM_AttributeIDs, value As Boolean)
+Public Sub SetAttributeViBoolean(channelName As String, attributeID As niDMM_AttributeIDs, value As Boolean)
     CheckError niDMM_SetAttributeViBoolean(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeString(channelName As String, attributeID As niDMM_AttributeIDs, ByRef value As String)
+Public Sub GetAttributeViString(channelName As String, attributeID As niDMM_AttributeIDs, ByRef value As String)
     Dim size As Long
     Dim buffer() As Byte
     
@@ -208,26 +179,26 @@ Public Sub GetAttributeString(channelName As String, attributeID As niDMM_Attrib
     value = StrConv(LeftB(buffer(), size - 1), vbUnicode) ' Remove \0 character and convert to unicode
 End Sub
 
-Public Sub SetAttributeString(channelName As String, attributeID As niDMM_AttributeIDs, value As String)
+Public Sub SetAttributeViString(channelName As String, attributeID As niDMM_AttributeIDs, value As String)
     CheckError niDMM_SetAttributeViString(m_Session, channelName, attributeID, value)
 End Sub
 
 ' Mapping properties to Get/Set Attribute function for compatibity
 ' This can always be done to improve usability but its adds overhead to adding support for attributes.
 Public Property Get Powerline_Freq() As Double
-    GetAttributeDouble "", NIDMM_ATTR_POWERLINE_FREQ, Powerline_Freq
+    GetAttributeViReal64 "", NIDMM_ATTR_POWERLINE_FREQ, Powerline_Freq
 End Property
 
 Public Property Let Powerline_Freq(ByVal value As Double)
-    SetAttributeDouble "", NIDMM_ATTR_POWERLINE_FREQ, value
+    SetAttributeViReal64 "", NIDMM_ATTR_POWERLINE_FREQ, value
 End Property
 
 Public Property Get Resolution_Absolute() As Double
-    GetAttributeDouble "", NIDMM_ATTR_RESOLUTION_ABSOLUTE, Resolution_Absolute
+    GetAttributeViReal64 "", NIDMM_ATTR_RESOLUTION_ABSOLUTE, Resolution_Absolute
 End Property
 
 Public Property Let Resolution_Absolute(ByVal value As Double)
-    SetAttributeDouble "", NIDMM_ATTR_RESOLUTION_ABSOLUTE, value
+    SetAttributeViReal64 "", NIDMM_ATTR_RESOLUTION_ABSOLUTE, value
 End Property
 
 
