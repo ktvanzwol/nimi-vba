@@ -88,13 +88,13 @@ Sub OptionStringAndAttributeTests()
     
     Set cRFSA = niRFSA_CreateSession(sResourceName, optionString:="Simulate=1,DriverSetup=Model:5831")
     With cRFSA
-        .GetAttributeString "", NIRFSA_ATTR_AVAILABLE_PORTS, ports
-        .SetAttributeString "", NIRFSA_ATTR_SELECTED_PORTS, "if1"
-        .GetAttributeString "", NIRFSA_ATTR_SELECTED_PORTS, selectedPort
-        .SetAttributeDouble "", NIRFSA_ATTR_REFERENCE_LEVEL, 1.234
-        .GetAttributeDouble "", NIRFSA_ATTR_REFERENCE_LEVEL, referenceLevel
-        .SetAttributeLong "", NIRFSA_ATTR_ACQUISITION_TYPE, NIRFSA_VAL_SPECTRUM
-        .GetAttributeLong "", NIRFSA_ATTR_ACQUISITION_TYPE, acqType
+        .GetAttributeViString "", NIRFSA_ATTR_AVAILABLE_PORTS, ports
+        .SetAttributeViString "", NIRFSA_ATTR_SELECTED_PORTS, "if1"
+        .GetAttributeViString "", NIRFSA_ATTR_SELECTED_PORTS, selectedPort
+        .SetAttributeViReal64 "", NIRFSA_ATTR_REFERENCE_LEVEL, 1.234
+        .GetAttributeViReal64 "", NIRFSA_ATTR_REFERENCE_LEVEL, referenceLevel
+        .SetAttributeViInt32 "", NIRFSA_ATTR_ACQUISITION_TYPE, NIRFSA_VAL_SPECTRUM
+        .GetAttributeViInt32 "", NIRFSA_ATTR_ACQUISITION_TYPE, acqType
     End With
     
     Debug.Print "Available Ports  = "; ports
