@@ -9,19 +9,6 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-' Attribute IDs
-' Note: in header files IVI_SPECIFIC_PUBLIC_ATTR_BASE = 1150000
-Public Enum niRFSG_AttributeIDs
-    NIRFSG_ATTR_EXTERNAL_GAIN = (1150000 + &H55)
-End Enum
-
-' - Values for attribute NIRFSG_ATTR_GENERATION_MODE -
-Public Enum niRFSG_GenerationMode
-    NIRFSG_VAL_CW = 1000
-    NIRFSG_VAL_ARB_WAVEFORM = 1001
-    NIRFSG_VAL_SCRIPT = 1002
-End Enum
-
 'ViStatus _VI_FUNC niRFSG_init(ViRsrc resourceName, ViBoolean IDQuery, ViBoolean resetDevice, ViSession* vi);
 Private Declare PtrSafe Function niRFSG_init Lib "niRFSG_64" ( _
     ByVal resourceName As String, ByVal IDQuery As Boolean, ByVal resetDevice As Boolean, ByRef vi As Long) As Long
@@ -192,27 +179,31 @@ Public Sub SelfCal()
     CheckError niRFSG_SelfCal(m_Session)
 End Sub
 
-Public Sub SetAttributeLong(channelName As String, attributeID As niRFSG_AttributeIDs, value As Long)
+Public Sub GetAttributeViInt32(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As Long)
+    CheckError niRFSG_GetAttributeViInt32(m_Session, channelName, attributeID, value)
+End Sub
+
+Public Sub SetAttributeViInt32(channelName As String, attributeID As niRFSG_AttributeIDs, value As Long)
     CheckError niRFSG_SetAttributeViInt32(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeLongLong(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As LongLong)
+Public Sub GetAttributeViInt64(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As LongLong)
     CheckError niRFSG_GetAttributeViInt64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeLongLong(channelName As String, attributeID As niRFSG_AttributeIDs, value As LongLong)
+Public Sub SetAttributeViInt64(channelName As String, attributeID As niRFSG_AttributeIDs, value As LongLong)
     CheckError niRFSG_SetAttributeViInt64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeDouble(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As Double)
+Public Sub GetAttributeViReal64(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As Double)
     CheckError niRFSG_GetAttributeViReal64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeDouble(channelName As String, attributeID As niRFSG_AttributeIDs, value As Double)
+Public Sub SetAttributeViReal64(channelName As String, attributeID As niRFSG_AttributeIDs, value As Double)
     CheckError niRFSG_SetAttributeViReal64(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeString(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As String)
+Public Sub GetAttributeViString(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As String)
     Dim size As Long
     Dim buffer() As Byte
     
@@ -223,15 +214,15 @@ Public Sub GetAttributeString(channelName As String, attributeID As niRFSG_Attri
     value = StrConv(LeftB(buffer(), size - 1), vbUnicode) ' Remove \0 character and convert to unicode
 End Sub
 
-Public Sub SetAttributeString(channelName As String, attributeID As niRFSG_AttributeIDs, value As String)
+Public Sub SetAttributeViString(channelName As String, attributeID As niRFSG_AttributeIDs, value As String)
     CheckError niRFSG_SetAttributeViString(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub GetAttributeBoolean(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As Boolean)
+Public Sub GetAttributeViBoolean(channelName As String, attributeID As niRFSG_AttributeIDs, ByRef value As Boolean)
     CheckError niRFSG_GetAttributeViBoolean(m_Session, channelName, attributeID, value)
 End Sub
 
-Public Sub SetAttributeBoolean(channelName As String, attributeID As niRFSG_AttributeIDs, value As Boolean)
+Public Sub SetAttributeViBoolean(channelName As String, attributeID As niRFSG_AttributeIDs, value As Boolean)
     CheckError niRFSG_SetAttributeViBoolean(m_Session, channelName, attributeID, value)
 End Sub
 
