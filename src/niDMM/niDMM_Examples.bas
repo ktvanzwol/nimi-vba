@@ -20,12 +20,12 @@ Sub MeasureDMM()
     Set cDMM = niDMM_CreateSession(sResourceName)
     With cDMM
         .ConfigureMeasurementDigits lFunction, dRange, dResolutionDigits
-        .SetAttributeDouble "", NIDMM_ATTR_POWERLINE_FREQ, NIDMM_VAL_50_HERTZ
+        .SetAttributeViReal64 "", NIDMM_ATTR_POWERLINE_FREQ, NIDMM_VAL_50_HERTZ
         .Read dReading
     End With
     
     cDMM.Read dReading
-    cDMM.GetAttributeDouble "", NIDMM_ATTR_RESOLUTION_ABSOLUTE, dResolutionAbsolute
+    cDMM.GetAttributeViReal64 "", NIDMM_ATTR_RESOLUTION_ABSOLUTE, dResolutionAbsolute
     
     Debug.Print "Reading    = "; dReading
     Debug.Print "Resolution = "; dResolutionAbsolute
