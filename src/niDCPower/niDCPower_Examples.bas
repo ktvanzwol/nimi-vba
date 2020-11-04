@@ -38,7 +38,7 @@ Sub SinglePointForceMeasureDCVoltage()
         .ConfigureVoltageLevelRange sChannel, dLevelRange
         .ConfigureCurrentLimit sChannel, dLimit
         .ConfigureCurrentLimitRange sChannel, dLimitRange
-        .SetAttributeDouble sChannel, NIDCPOWER_ATTR_SOURCE_DELAY, dSourceDelay
+        .SetAttributeViReal64 sChannel, NIDCPOWER_ATTR_SOURCE_DELAY, dSourceDelay
     End With
     
     ' Initiate Sourcing
