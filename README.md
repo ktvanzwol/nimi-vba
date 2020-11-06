@@ -66,63 +66,85 @@ The following table shows how to map the common C datatypes used in the NI Modul
 
 ### By Value vs By Reference
 
-In general when passing C arguments By Value you need to specify ``ByVal`` for the argument in the VBA Declare statement. By default the VBA Declare statement will assume passing the the C argument by reference (e.g. using a pointer). However it is good practise to specify ``ByRef`` in the VBA declare statement in this case.
+In general when passing C arguments By Value you need to specify arguments with ``ByVal`` in the VBA Declare statement. By default the VBA Declare statement will assume passing the the C argument by reference (e.g. using a pointer). However it is good practise to specify ``ByRef`` in the VBA declare statement in this case.
 
 Example of a C Function followed by the corresponding VBA Declare statement.
 
 ```C
-ViStatus _VI_FUNC niDMM_GetAttributeViReal64(ViSession vi, ViConstString channelName, ViAttr attributeId, ViReal64 *value);
+ViStatus _VI_FUNC niDMM_GetAttributeViReal64(
+    ViSession vi,
+    ViConstString channelName,
+    ViAttr attributeId,
+    ViReal64 *value);
 ```
 
 ```VBA
 Private Declare PtrSafe Function niDMM_GetAttributeViReal64 Lib "niDMM_64" ( _
-    ByVal vi As Long, ByVal channelName As String, ByVal attributeID As Long, ByRef value As Double) As Long
+    ByVal vi As Long, _
+    ByVal channelName As String, _
+    ByVal attributeID As Long, _
+    ByRef value As Double _
+) As Long
 ```
 
 *Note how ByRef is used on the ``value`` argument.*
 
-There are a few special cases that requires handling the pointer values manually to correctly pass data. This are discussed in the next section
+There are a few special cases that requires handling the pointer values manually to correctly pass data. These are discussed in the next section
 
 ### Array Pointers
 
-Internally VBA stores Array types as a SAFEARRAY structure, as a result passing a array type ``ByRef`` will not work. C will expect the pointer to the start of the first array element. This can also be done on within VBA but requires you to pass the pointer by value and dereference is in VBA. To do this you need to define the array pointer argument as ``ByVal value As LongPtr`` in the VBA Declare statement. This will pass the value of the pointer between C and VBA.
+Arrays in VBA are treated semantically like value types but are implemented as reference types.Internally VBA stores Array types as a SAFEARRAY structure, as a result passing a array type ``ByRef`` in the declare statement will not work. C will expect the pointer to the start of the first array element which is reference in the SAFEARRAY.
 
-Example of a C Function that contains a array pointer (``attrVal[]``) and the corresponding VBA Declare statement.
+We can actually get to this pointer value by using the ``VarPtr()`` function on the first element in the VBA Array. ``VarPtr()`` will return the pointer value as a ``LongPtr`` type, the ``LongPtr`` type is a 32 bits ``Long`` in 32 bits Office and a 64 bits ``LongLong`` in 64 bits Office.
+
+We can also use the ``LongPtr`` with the VBA Declare statement to directly pass pointers by value by defining a C pointer argument as ``ByVal value As LongPtr`` in the VBA Declare statement. We can use this to pass VBA Arrays to C external code.
+
+Here is an example of a C Function that contains array pointers (``voltageMeasurements[]`` and ``currentMeasurements[]``) and the corresponding VBA Declare statement using the ``LongPtr`` type.
 
 ```C
-int32 __stdcall RFmxInstr_GetAttributeF64Array(niRFmxInstrHandle instrumentHandle, char selectorString[], int32 attributeID, float64 attrVal[], int32 arraySize, int32 *actualArraySize);
+ViStatus niDCPower_MeasureMultiple(
+    ViSession vi,
+    ViConstString channelName,
+    ViReal64 voltageMeasurements[],
+    ViReal64 currentMeasurements[]);
 ```
 
 ```VBA
-Private Declare PtrSafe Function RFmxInstr_GetAttributeF64Array Lib "niRFmxInstr" ( _
-    ByVal instrumentHandle As LongPtr, ByVal selectorString As String, ByVal attributeID As Long, ByVal attrVal As LongPtr, ByVal arraySize As Long, ByRef actualArraySize As Long) As Long
+Private Declare PtrSafe Function niDCPower_MeasureMultiple Lib "niDCPower_64" ( _
+    ByVal vi As Long, _
+    ByVal channelName As String, _
+    ByVal voltageMeasurements As LongPtr, _
+    ByVal currentMeasurements As LongPtr _
+) As Long
 ```
 
-Inorder to pass a VBA array to C you now need to get the pointer to the start of the first element of the array. This can be done using the ``VarPtr()`` function. To get the right pointer value use the ``VarPtr()`` function on the first ellement of the array variable like shown below.
+We can now pass the VBA array to C by using the ``VarPtr()`` funtion on the arrays first ellement to get the correct pointer value to pass to use in the C function call. Like in this example:
 
 ```VBA
-VarPtr( myArrayVarable( 0 ) )
+Dim voltageMeasurements() As Double
+Dim currentMeasurements() As Double
+Dim numMeasurements As Long
+Dim status As Long
 
-' Or the more generic
-VarPtr( myArrayVarable( LBound( myArrayVarable ) ) )
+numMeasurements = 4
+ReDim voltageMeasurements(numMeasurements) As Double
+ReDim currentMeasurements(numMeasurements) As Double
+
+status = niDCPower_MeasureMultiple(m_Session, "", _
+                VarPtr( voltageMeasurements(0) ), VarPtr( currentMeasurements(0) ))
 ```
 
 ### Strings
 
-VBA Strings BSTR's which are UNICODE encodes strings preceded by the string length and in C these are basic ASCII strings with a null terminating characters. This means strings need to be converted when passed between VBA and C.
+Similar to arrays, strings in VBA are treated semantically like value types but are implemented as reference types. VBA Strings are represented a BSTR's which are multi byte UNICODE encodes strings preceded by the string length. In C strings are represented as byte arrays using ASCII characters with a null terminating character. This means strings need to be converted when passed between VBA and C.
 
-When dealing static string beeing passed from VBA into a C DLL this can be done directly by VBA bu defining the argument as ``ByVal String`` In this case you can pass a VBA String directly to the C DLL and VBA will be automatically converted the string from BSTR to an ASCII null terminated string.
+The VBA Declare statement is able to handle some of this conversion for us. In the case of passing static strings to C external code you can simple define the argument as ``ByVal String``. In this case the conversion to null terminated ASCII string is done automatically.
 
-When you pass strings from the C DLL back to VBA you will need to do this conversion your self. 
+In nimi-vba this is can be used for the majority of use cases. The notible exceptions are reciving error messanege and reading string type attributes. More generically speaking these are the cases were you need to read a dynamic size string typically you need to call the function twich. Once with NULL pointer to retrive the size of the string followed by a call with the properly sized string.
 
-C Strings are stored as Byte Arrays ``char *`` so we can use the same aproach as for arrays to receive a C style string from external code.
-But VBA uses Ninicode and wide characters for its ``String`` type so we also need to deal with the convertion between Byte Array and String types.
+In this situation you need to treat the string as a ``Byte`` array. This allows you to pass 0 as the pointer value to query the requires for the size of the ``Byte`` array. The second call would get the string as a byte array en then needs to be converted to a native VBA string using the ``StrConv`` function.
 
-#### Receiving Strings
-
-When receiving strings you typically need to pass the pointer to a pre allocated string of the right lenght to the C function. When the function returned you then need to use the ``StrConv`` function with the byte array to convert to Unicode.
-
-Example of receiving a string using the ``niDMM_GetError`` function:
+An example of this using the ``niDMM_GetError`` function's ``errMessage`` argument:
 
 ```VBA
 'ViStatus _VI_FUNC niDMM_GetError(ViSession vi, ViStatus *errorCode, ViInt32 bufferSize, ViChar description[]);
@@ -140,30 +162,19 @@ Sub GetErrorMessage(m_Session As Long, errorCode As Long, ByRef errorMsg As Stri
     Dim errorMsg As String
 
     size = niDMM_GetError(m_Session, errorCode, 0, 0)
-    ReDim buffer(size) As Byte
+    ReDim buffer(size - 1) As Byte 'In VBA the upperbound is inclusive.
 
     status = niDMM_GetError(m_Session, errorCode, size, VarPtr(buffer(0)))
-    errorMsg = StrConv(buffer(), vbUnicode)
+    'Remove \0 character with LeftB and convert to Unicode with StrConv
+    errorMsg = StrConv(LeftB(buffer(), size - 1), vbUnicode)
 End Sub
 ```
 
-First note that the errorMsg ``char *`` argument is declared ``ByVal`` and as a ``LongPtr``. ``niDMM_GetError`` is first called with size set to 0 and a ``NULL`` pointer value, this will return the number of bytes needed for the buffer. Then ``ReDim`` is used to allocate the needed buffer and on the second call the pointer to this buffer is passed to the function using ``VarPtr(buffer(0))``.
-
-And as the final step ``errorMsg = StrConv(buffer(), vbUnicode)`` converts the C stype string to the Unicode String used by VBA.
-
-#### Sending Strings
-
-The ``StrConv`` function can also be used to convert from Unicode strings to C Style strings:
+Note that the ``StrConv`` function can also be used to convert from Unicode strings to C Style ASCII strings. E.g. a ``Byte`` array:
 
 ```VBA
 buffer() = StrConv("StackOverflow", vbFromUnicode)
 ```
-
-This statement converts a Unicode String to a C Style string stored in a Byte array. In the same way you can pass the pointer to this Byte array to a C function like so: ``VarPtr(buffer(0))``.
-
-#### Using the ``ByVal str As String`` declaration
-
-VBA can handle the unicode convertion automatically when you define the argument using a ``ByVal String``. This works on most cases when you are dealing with input only arguments, typically defined as ``const char *`` in C. As soon as you need to be able to pass a ``NULL`` pointer value you need to use the more generic ``LongPtr`` and Byte array declaration method wich is more typical when receiving strings.
 
 ## VBA Resources
 
