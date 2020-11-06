@@ -87,7 +87,7 @@ Private Declare PtrSafe Function niDMM_GetAttributeViReal64 Lib "niDMM_64" ( _
 ) As Long
 ```
 
-*Note how ByRef is used on the ``value`` argument.*
+*Note how ``ByRef`` is used on the ``value`` argument.*
 
 There are a few special cases that requires handling the pointer values manually to correctly pass data. These are discussed in the next section
 
