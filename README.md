@@ -30,13 +30,21 @@ To install and test the nimi-vba manually import you can import the modules from
 
 Inorder to automatically import you first need to enable *Access to the VBA Project object model* in the Trust Center. To do this go into the **Excel Options**, Select **Trust Center** and click the **Trust Center Settings...** button. Select **Macro Settings** and place a check mark before **Trust access to the VBA object model**
 
+![](https://github.com/ktvanzwol/nimi-vba/raw/master/doc/Excel%20VBA%20Project%20Option.png)
+
 Once this is done open the **nimi-vba ExcelTool.xlsm** file then on the nimi-vba sheet set the **Target Workbook** to *\<Create new Workbook\>* and click the Import/Update button on the sheet. This will create a new sheet and import all the nimi-vba modules into it.
 
-Alternatively you can open anexsition workbook first and then select this as the Target Workbook to Import/Update nimi-vba in an existing application.
+![](https://github.com/ktvanzwol/nimi-vba/raw/master/doc/nimi-vba%20Excel%20Tool.png)
+
+Alternatively you can open an existing workbook first and then select this as the Target Workbook to Import/Update nimi-vba in an existing application.
+
+> :warning: **After confirming the import any existing module with a matching name will be overwriten without notification.**
 
 ### Exporting
 
 If you fixed issues and or extended nimi-vba you can export modules manually or use the same **nimi-vba ExcelTool.xlsm** file to automatically export modules back into the **src** folder structure. To automatically export the modules open **nimi-vba ExcelTool.xlsm** and the excel application with the updates. Next Select the excel application workbook with the updates as the **Target Workbook** and click the Export button.
+
+> :warning: **After confirming the export any existing files in the src folder structure will be overwriten without notification.**
 
 ## Mapping C types to VBA Types
 
