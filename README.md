@@ -30,11 +30,11 @@ To install and test the nimi-vba manually import you can import the modules from
 
 Inorder to automatically import you first need to enable *Access to the VBA Project object model* in the Trust Center. To do this go into the **Excel Options**, Select **Trust Center** and click the **Trust Center Settings...** button. Select **Macro Settings** and place a check mark before **Trust access to the VBA object model**
 
-![](https://github.com/ktvanzwol/nimi-vba/raw/master/doc/Excel%20VBA%20Project%20Option.png)
+![Excel VBA Project Option in Trust Center](https://github.com/ktvanzwol/nimi-vba/raw/master/doc/Excel%20VBA%20Project%20Option.png)
 
 Once this is done open the **nimi-vba ExcelTool.xlsm** file then on the nimi-vba sheet set the **Target Workbook** to *\<Create new Workbook\>* and click the Import/Update button on the sheet. This will create a new sheet and import all the nimi-vba modules into it.
 
-![](https://github.com/ktvanzwol/nimi-vba/raw/master/doc/nimi-vba%20Excel%20Tool.png)
+![nimi-vba ExcelTool.xlsm screenshot](https://github.com/ktvanzwol/nimi-vba/raw/master/doc/nimi-vba%20Excel%20Tool.png)
 
 Alternatively you can open an existing workbook first and then select this as the Target Workbook to Import/Update nimi-vba in an existing application.
 
@@ -45,6 +45,44 @@ Alternatively you can open an existing workbook first and then select this as th
 If you fixed issues and or extended nimi-vba you can export modules manually or use the same **nimi-vba ExcelTool.xlsm** file to automatically export modules back into the **src** folder structure. To automatically export the modules open **nimi-vba ExcelTool.xlsm** and the excel application with the updates. Next Select the excel application workbook with the updates as the **Target Workbook** and click the Export button.
 
 > :warning: **After confirming the export any existing files in the src folder structure will be overwriten without notification.**
+
+## nimi-vba Structure
+
+Each top level driver mapping is implemented with at least two modules, a ``Class Module`` and a ``Code Module``. And for each driver add-on library an addition Class Module is added (e.g. for the RFSG Playback Library or specific RFmx personaliies like SpecAn etc.). Optionaly there can be an example ``Code Module`` that contains examples or test code.
+
+### Source Files
+
+#### The Class Module
+
+The ``Class Module`` defines a session object that wraps a drivers instrument session. The different API functions map to methods on the session object. The class module contains the following features:
+
+- All VBA declare statements for each external C function call supported.
+- A ``Public Sub InitSession`` used by the Factory Method to initialize a object.
+- The ``Class_Initialize`` and ``Class_Terminate`` Events (VBA's constructor and destructors)
+  - ``Class_Initialize`` initializes the private memeber varables to default values. The actual object initialization is done by the ``InitSession`` sub.
+  - ``Class_Terminate`` automatically closes the session when the object reference is deleted (object variable set to ``Nothing`` or goes out of scope)
+- A ``Private Sub ErrorHandler`` This is used internally and basically raises a Error when a function call returns a error code. This includes querying for a detailed error message.
+- A ``Private Sub CheckError`` this utility sub that calls the ``ErrorHandler`` if the returned status is a error code.
+- ``Public Sub <Methods>`` for each supported function call. Typically these directly call the external C function mapped by the VBA Declare statement inside ``CheckError``.
+  - In some case these are customized to handle certain actions in a more VBA friendly way. Most notably allocating memory (``ReDim``) for arrays and strings returned from the external C function.
+
+#### The Code Module
+
+The ``Code Module`` supporting the main ``Class Module`` contains the Factory Method to help the user to create the Session object by specifying the instrument resource name.
+
+Next to the Factory method the ``Code Module`` also contains all driver specific Constants, Enumerations and User Types as needed.
+
+#### Add-on Libray Class Modules
+
+Any add-on library ``Class Modules`` are implemented the same way as normal class modules. The main exacption is the initialization. A add-on library by definition uses the same session as the driver but adds a higher level file playback or measurement centric API to the lower level instrument APIs.
+
+For this reason each Add-on ``Class Module`` is automatically created when the parent driver object gets created. The higher level functions can then be accessed trough a read-only property: ``cRFSA.Playback`` or ``cRFmx.SpecAn``. The Add-on Library object is automatically initialized by in drivers ``InitSession`` sub and stored internally. When the ``Class_Terminate`` event is fired the internal variable is set to ``Nothing`` to automatically trigger the Add-ons own ``Class_Terminate`` event.
+
+### Get & Set Attributes
+
+The NI drivers make extensive use of attributes for configuration of the instrument and/or measurements. Each driver comes with a set of attribute Set and Get functions for the required attribute types. These functions can be used for configuration by setting attributes. The most VBA friendly way to implement attributes would be to use properties. Each property would match the attribute type and call the coresponding attribute Get/Set function with a fixed attribute ID value.
+
+Due to the added overhaed of doing this manually for this PoC the choice was made to expose the Get/Set function on the Session object so they can be accessed by the user. For the attribute IDs a Enum is used which is created by copying #define declations form the C header files and reformating them to VBA Enums. The Enum is used for the Attribute ID parameters to aid in finding the right enum entry.
 
 ## Mapping C types to VBA Types
 
